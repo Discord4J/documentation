@@ -9,6 +9,7 @@ module.exports = {
   favicon: 'img/favicon.ico',
   organizationName: 'Discord4J',
   projectName: 'Discord4J',
+  plugins: ['docusaurus-tailwindcss-loader'],
   themeConfig: {
     navbar: {
       title: 'Discord4J',
