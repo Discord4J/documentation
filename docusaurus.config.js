@@ -17,20 +17,23 @@ module.exports = {
         alt: 'Discord4J Logo',
         src: 'img/logo.svg',
       },
-      items: [
-        {
-          to: 'docs/',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
-        },
-        { to: 'blog', label: 'Blog', position: 'left' },
-        {
-          href: 'https://github.com/Discord4J/Discord4J',
-          label: 'GitHub',
-          position: 'right',
-        },
-      ],
+      // items: [
+      //   {
+      //     to: 'docs/',
+      //     activeBasePath: 'docs',
+      //     label: 'Docs',
+      //     position: 'left',
+      //   },
+      //   { to: 'blog', label: 'Blog', position: 'left' },
+      //   {
+      //     href: 'https://github.com/Discord4J/Discord4J',
+      //     label: 'GitHub',
+      //     position: 'right',
+      //   },
+      // ],
+    },
+    prism: {
+      theme: require('./themes/darcula')
     },
     footer: {
       style: 'dark',
@@ -86,13 +89,14 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/Discord4J/documentation/edit/master/',
         },
-        blog: {
-          showReadingTime: true,
-          editUrl: 'https://github.com/Discord4J/documentation/edit/master/',
-        },
+        // blog: {
+        //   showReadingTime: true,
+        //   editUrl: 'https://github.com/Discord4J/documentation/edit/master/',
+        // },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },

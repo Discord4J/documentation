@@ -1,6 +1,26 @@
 module.exports = {
   docs: {
-    Docusaurus: ['doc1', 'doc2', 'doc3'],
-    Features: ['mdx'],
+    Discord4J: [
+      'docs-index',
+      'getting-started',
+      'basic-bot-tutorial',
+      'frequently-asked-questions',
+      'error-handling',
+      'lambda-tutorial',
+      'logging',
+      'migrating-from-v2-x-to-v3-1',
+      'migrating-from-v3-x-to-v3-1',
+      'music-bot-tutorial',
+      'reactive-reactor-tutorial',
+      'sharding',
+      'specs',
+      'threading',
+      'using-jitpack',
+      'using-latest-snapshots',
+      'using-the-bom',
+      'versions',
+      'whats-new-in-v3-1',
+      'glossary',
+    ],
   },
 }
