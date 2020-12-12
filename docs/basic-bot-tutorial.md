@@ -5,7 +5,6 @@ sidebar_label: Basic Bot Tutorial
 slug: /basic-bot-tutorial
 ---
 
-
 Making your first bot is very simple. This tutorial will walk you through how to make a basic bot that responds to a ping command and listens to some other events.
 
 ## Constructing the client

@@ -5,7 +5,6 @@ sidebar_label: Migrating from v3.x to v3.1
 slug: /migrating-from-v3-0-to-v3-1
 ---
 
-
 # Before you start
 
 NOTE: Feel free to suggest changes or to point out things missing while you migrate. Thanks!
@@ -21,6 +20,7 @@ While this means that a single `EventDispatcher` and `StateHolder` are shared ac
 For a more in-depth explanation of the new features and changes introduced check [What's new in v3.1](whats-new-in-v3-1) and [glossary](glossary).
 
 ## Updating dependencies
+
 Discord4J v3.1 depends on Reactor Dysprosium release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.3.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 0.9.x).
 
 One important change in Reactor is the addition of the `Schedulers.boundedElastic()` scheduler that caps the number of threads. It should help for cases when you do blocking operations whilst keeping a limit on the amount of threads created.
@@ -124,7 +124,6 @@ gateway.onDisconnect().block(); // <4>
 - <3> Shortcut to `gateway.getEventDispatcher().on(ReadyEvent.class)`
 - <4> To keep the `main` thread alive, await until bot disconnects through `logout()`
 
-
 You can also connect using a traditional `flatMap` style, but if you're going this route we recommend the new `withGateway` API:
 
 ```java
@@ -179,55 +178,64 @@ Most of the options you would previously set at the `DiscordClientBuilder` or `S
 
 Get a builder with `client.gateway()` and then call `setSharding(ShardingStrategy)`. Creating a `ShardingStrategy` can be done using the following factories:
 
-* `ShardingStrategy.recommended()` will provide the recommended amount of shards and include all of them in the group
-* `ShardingStrategy.fixed(n)` will use the given `shardCount` and include all shards `0..N` in the group
-* `ShardingStrategy.single()` will use a simple `[0,1]` configuration, for small bots and [distributed bot architectures](https://github.com/Discord4J/connect)
+- `ShardingStrategy.recommended()` will provide the recommended amount of shards and include all of them in the group
+- `ShardingStrategy.fixed(n)` will use the given `shardCount` and include all shards `0..N` in the group
+- `ShardingStrategy.single()` will use a simple `[0,1]` configuration, for small bots and [distributed bot architectures](https://github.com/Discord4J/connect)
 
 You can also customize the strategy using `ShardingStrategy.builder()` allowing you to configure:
 
-* Total count of shards parameter through `count`
-* Shards identified to the Gateway using `indices`
-* Can be also combined with `filter` to connect a subset of shards
+- Total count of shards parameter through `count`
+- Shards identified to the Gateway using `indices`
+- Can be also combined with `filter` to connect a subset of shards
 
 ### Migrating from `setInitialPresence`
+
 Similar to above, call `setInitialStatus` which now takes a `Function<ShardInfo, StatusUpdate>`. If you used `setInitialPresence(Presence.invisible())` you should now use `setInitialStatus(shard -> Presence.invisible())`
 
 ### Migrating from `setIdentifyOptions`
+
 `IdentifyOptions` cannot be set directly now and you'll have to use a mix of `setSharding` and `setResumeOptions` depending on your use case.
 
 ### Migrating from `setStoreService(service)`
+
 Get a builder with `client.gateway()` and then call `setStoreService(service)`. If you used `ShardingClientBuilder` before, Discord4J can automatically prepare your `StoreService` with shard invalidation capabilities.
 
 ### Migrating from `setEventProcessor` and `setEventScheduler`
+
 A new interface `EventDispatcher` is added to more easily customize both options. There are a few built-in factories:
 
-* `EventDispatcher.buffering()` that stores all events **until the first subscription**, then events are published to all subscribers as they are received. This is identical to the one used in v3.0.
-* `EventDispatcher.withEarliestEvents(int)` keeps only the earliest events and the rest are dropped **until the first subscription**, then events are published to all subscribers as they are received.
-* `EventDispatcher.withLatestEvents(int)` keeps only the latest events **until the first subscription**, then events are published to all subscribers as they are received. Initial events like `ReadyEvent` might be dropped.
-* `EventDispatcher.replayingWithTimeout(Duration)` that buffers and replays all events up to `Duration` maximum age.
-* `EventDispatcher.replayingWithSize(int)` that buffers and replays the latest events.
+- `EventDispatcher.buffering()` that stores all events **until the first subscription**, then events are published to all subscribers as they are received. This is identical to the one used in v3.0.
+- `EventDispatcher.withEarliestEvents(int)` keeps only the earliest events and the rest are dropped **until the first subscription**, then events are published to all subscribers as they are received.
+- `EventDispatcher.withLatestEvents(int)` keeps only the latest events **until the first subscription**, then events are published to all subscribers as they are received. Initial events like `ReadyEvent` might be dropped.
+- `EventDispatcher.replayingWithTimeout(Duration)` that buffers and replays all events up to `Duration` maximum age.
+- `EventDispatcher.replayingWithSize(int)` that buffers and replays the latest events.
 
 To customize the above options, get a builder with `client.gateway()` and then call `setEventDispatcher(...)`.
 
 The current default is a `ReplayingEventDispatcher`, created using `ReplayingEventDispatcher.create()`. It can be customized through `ReplayingEventDispatcher.builder()` and it works in the following way:
 
-* Buffers all events before a subscription exists, as long as they match a filter. By default, `GatewayLifecycleEvent` and `GuildCreateEvent` types. This can be customized through `replayEventFilter`.
-* Early subscribers get all previously buffered events, until a given timeout. By default, 5 seconds after the first subscriber arrives and can be changed in `stopReplayingTrigger`.
-* Late subscribers only get events as they are published, no replay capabilities until all subscribers are disposed.
+- Buffers all events before a subscription exists, as long as they match a filter. By default, `GatewayLifecycleEvent` and `GuildCreateEvent` types. This can be customized through `replayEventFilter`.
+- Early subscribers get all previously buffered events, until a given timeout. By default, 5 seconds after the first subscriber arrives and can be changed in `stopReplayingTrigger`.
+- Late subscribers only get events as they are published, no replay capabilities until all subscribers are disposed.
 
 ### Migrating from `setGatewayClientFactory`
+
 Use `login(Function)` overload after calling `client.gateway()`. Used to build distributed bot architectures.
 
 ### Migrating from `setRetryOptions`
+
 Use `setReconnectOptions` after calling `client.gateway()`. By default, Discord4J will always attempt to reconnect using an exponential backoff with jitter strategy.
 
 ### Migrating from `setGatewayObserver`
+
 Use `setGatewayObserver` after calling `client.gateway()`.
 
 ### Migrating from `setIdentifyLimiter`
+
 Discord4J v3.1 introduced a new API called `ShardCoordinator` which groups all options related to coordinating multiple shard identification. We supply `LocalShardCoordinator` by default and can be replaced by one capable of working with a distributed bot architecture.
 
 ### Migrating from `setVoiceConnectionScheduler`
+
 Use `setVoiceReactorResources` after calling `client.gateway()`. It takes a `ReactorResource` object that will replace the one set at the `DiscordClientBuilder` level only for voice. A similar override exists for gateway in `setGatewayReactorResources`.
 
 ### Gateway options
@@ -250,14 +258,13 @@ GatewayDiscordClient gateway = client.gateway()
 - <1> Set the initial presence depending on the shard.
 - <2> Sharding policy used by this shard group builder.
 - <3> Allows coordinating shard login across multiple instances.
-- <4> Configures how to obtain a `GatewayDiscordClient`: if `false`, once the connection process begins (at least 1 shard connects, this is the default) or  if `true`, await until all shards have connected.
+- <4> Configures how to obtain a `GatewayDiscordClient`: if `false`, once the connection process begins (at least 1 shard connects, this is the default) or if `true`, await until all shards have connected.
 - <5> Configure the backing store.
 - <6> Configure the event dispatcher model.
 
 ## Customizing REST features
 
 Core options for REST operations are set at `DiscordClientBuilder` before building a `DiscordClient`, similar to v3.0. These core resources can later by retrieved through `DiscordClient::getCoreResources()` or `GatewayDiscordClient::getCoreResources()` methods.
-
 
 ```java
 JacksonResources jackson = new JacksonResources();
@@ -285,16 +292,16 @@ DiscordClient.builder(System.getenv("token")) // <1>
 
 Starting from v3.1, Discord4J allows you to access **REST entities**, which identifies a given Discord entity in terms of their key parameters, without querying the REST API until you require access to the data they represent. This is expressed across two kinds of classes:
 
-* `RestEntity` classes provide a way to query the REST API for a specific entity. They are located in the `discord4j.rest.entity` package.
-* `EntityData` classes represent a JSON response encapsulated in an immutable object. They are located in the `discord4j.discordjson.json` package.
+- `RestEntity` classes provide a way to query the REST API for a specific entity. They are located in the `discord4j.rest.entity` package.
+- `EntityData` classes represent a JSON response encapsulated in an immutable object. They are located in the `discord4j.discordjson.json` package.
 
 #### Creating REST entities
 
 Here are the multiple locations you can get a REST entity from:
 
-* Replace "Entity" in the following examples with the one you're looking for: Channel, Emoji, Guild, Invite, Member, Message, Role, User, Webhook.
-* Any of the `getEntityById()` methods in `DiscordClient` or `GatewayDiscordClient::rest()` and you'll get a `RestEntity` class
-* Create them directly by ID: `RestEntity.create(123456789012345L)`
+- Replace "Entity" in the following examples with the one you're looking for: Channel, Emoji, Guild, Invite, Member, Message, Role, User, Webhook.
+- Any of the `getEntityById()` methods in `DiscordClient` or `GatewayDiscordClient::rest()` and you'll get a `RestEntity` class
+- Create them directly by ID: `RestEntity.create(123456789012345L)`
 
 The classes available are: `RestChannel`, `RestEmoji`, `RestGuild`, `RestInvite`, `RestMember`, `RestMessage`, `RestRole`, `RestUser` and `RestWebhook`
 
@@ -317,17 +324,15 @@ GatewayDiscordClient gateway = discordClient.gateway()
 
 - <1> Only retrieve entities from store by default
 
-
 The following strategies are available:
 
-* `EntityRetrievalStrategy.STORE` to only fetch from the Store (cache) and therefore return empty if a request entity is missing.
-* `EntityRetrievalStrategy.REST` to fetch from REST directly, without attempting to hit the Store.
-* `EntityRetrievalStrategy.STORE_FALLBACK_REST` to use the default setting from v3.0, which is attempting to hit the Store and if it's missed, fall back to a REST API call.
+- `EntityRetrievalStrategy.STORE` to only fetch from the Store (cache) and therefore return empty if a request entity is missing.
+- `EntityRetrievalStrategy.REST` to fetch from REST directly, without attempting to hit the Store.
+- `EntityRetrievalStrategy.STORE_FALLBACK_REST` to use the default setting from v3.0, which is attempting to hit the Store and if it's missed, fall back to a REST API call.
 
 ## Logging
 
 Logger structure has changed for v3.1, adding contextual information regarding gateway ID, shard ID, request bucket and request ID. For more details about the available loggers in this version, check our [Logging](logging) page.
-
 
 ## Advanced features
 

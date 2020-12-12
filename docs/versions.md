@@ -5,16 +5,15 @@ sidebar_label: Versions
 slug: /versions
 ---
 
-
 # Support and compatibility
 
 The following table describes our current available versions, their support status, Discord API versions and compatibility with other projects like Spring Boot.
 
-| Discord4J                                                   | Support          | Gateway/API | Intents                           | Reactor           | Spring Boot   |
-|-------------------------------------------------------------|------------------|-------------|-----------------------------------|-------------------|---------------|
-| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/master)| In development   | v8          | Mandatory, [non-privileged as default](https://discord.com/developers/docs/topics/gateway#privileged-intents) | 3.4 (2020)        | 2.3 and above |
-| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x) | Current          | v6          | Optional, no intent default       | 3.3 (Dysprosium)  | 2.2 and above |
-| [v3.0.x](https://github.com/Discord4J/Discord4J/tree/3.0.x) | Maintenance only | v6          | No intents support                | 3.2 (Californium) | 2.1           |
+| Discord4J                                                    | Support          | Gateway/API | Intents                                                                                                       | Reactor           | Spring Boot   |
+| ------------------------------------------------------------ | ---------------- | ----------- | ------------------------------------------------------------------------------------------------------------- | ----------------- | ------------- |
+| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/master) | In development   | v8          | Mandatory, [non-privileged as default](https://discord.com/developers/docs/topics/gateway#privileged-intents) | 3.4 (2020)        | 2.3 and above |
+| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Current          | v6          | Optional, no intent default                                                                                   | 3.3 (Dysprosium)  | 2.2 and above |
+| [v3.0.x](https://github.com/Discord4J/Discord4J/tree/3.0.x)  | Maintenance only | v6          | No intents support                                                                                            | 3.2 (Californium) | 2.1           |
 
 All supported versions have JDK 8 baseline. Spring Boot compatibility is shown a general guideline as other versions might work through shading techniques for transitive libraries like Reactor and Netty.
 

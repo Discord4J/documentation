@@ -5,35 +5,42 @@ sidebar_label: Frequently Asked Questions
 slug: /frequently-asked-questions
 ---
 
-
 A non-comprehensive collection of common pitfalls/questions we see a lot when using Discord4J.
 
 # Snowflakes
+
 "What is a snowflake? How do I create one from an ID I got from Discord?"
 
-Snowflakes are the format Discord [uses](https://discord.com/developers/docs/reference#snowflakes) for their IDs. Discord4J encodes this in the type located at `discord4j.common.util.Snowflake` in v3.1 or `discord4j.core.object.util.Snowflake` in v3.0 which you will see all over the library. This provides a way to convert back and forth between different representations of snowflakes and some utilities around them. 
+Snowflakes are the format Discord [uses](https://discord.com/developers/docs/reference#snowflakes) for their IDs. Discord4J encodes this in the type located at `discord4j.common.util.Snowflake` in v3.1 or `discord4j.core.object.util.Snowflake` in v3.0 which you will see all over the library. This provides a way to convert back and forth between different representations of snowflakes and some utilities around them.
 
-To obtain a `Snowflake` from an ID you got from the Discord client, you can use one of its several static factory (`of()`) methods. The most convenient for this case is either `of(long)` or `of(String)`. There is no difference between these methods. For example, if my ID is `84766711735136256` I can do: `Snowflake.of("84766711735136256")` or `Snowflake.of(84766711735136256L)`. *Take note of the `L` at the end of the latter example.* This is a [long literal](https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html) and could be required to tell Java that the number is a `long`. 
+To obtain a `Snowflake` from an ID you got from the Discord client, you can use one of its several static factory (`of()`) methods. The most convenient for this case is either `of(long)` or `of(String)`. There is no difference between these methods. For example, if my ID is `84766711735136256` I can do: `Snowflake.of("84766711735136256")` or `Snowflake.of(84766711735136256L)`. _Take note of the `L` at the end of the latter example._ This is a [long literal](https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html) and could be required to tell Java that the number is a `long`.
 
 # Getting entities
+
 "I want to get a channel, role, guild, etc..."
+
 ## In response to an event
+
 "...when handling an event."
 
 If you have an `Event` and want to get an entity related to that event, more than likely there is a path to get to that info from the event. For example, `MessageCreateEvent` directly has `getGuild()` and the channel can be obtained through the related message like `getMessage().getChannel()`.
+
 ## Without an event
+
 "...outside of an event handler."
 
 If you don't have an `Event` or there isn't a way to get the entity you want from the event, you can use the fact that all entities have a unique ID associated to them called a `Snowflake`. You can [obtain](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) this ID in the Discord client and pass it to one of the many `getXById(Snowflake)` methods of `DiscordClient`.
 
 # Channel types
+
 "I can't send a message to a `Channel`, what gives?"
 
 Discord4J uses a hierarchy of types to separate the behavior of all of the different types of channels in Discord. Consider the fact that a method for sending messages doesn't make much sense for a `VoiceChannel`. Here is an overview of this hierarchy (with some of the internal details removed): ![Discord4J Channel Type Hierarchy](https://cdn.discordapp.com/attachments/451125724766535710/583071759155068928/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3231303933383535323536.png)
 
-In general, Discord4J uses the least specific type of channel it can. For example, `Message#getChannel()` gets you a `MessageChannel` which could be any of `TextChannel`, `NewsChannel`, or `PrivateChannel`. So, what should you do if you *know* you have one of the more specific types? Cast! This can be done in Reactor with either the [`ofType(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#ofType-java.lang.Class-) or [`cast(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#cast-java.lang.Class-) operator. So, to get a channel which you *know* is a `TextChannel` you could do `client.getChannelById(id).cast(TextChannel.class)`.
+In general, Discord4J uses the least specific type of channel it can. For example, `Message#getChannel()` gets you a `MessageChannel` which could be any of `TextChannel`, `NewsChannel`, or `PrivateChannel`. So, what should you do if you _know_ you have one of the more specific types? Cast! This can be done in Reactor with either the [`ofType(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#ofType-java.lang.Class-) or [`cast(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#cast-java.lang.Class-) operator. So, to get a channel which you _know_ is a `TextChannel` you could do `client.getChannelById(id).cast(TextChannel.class)`.
 
 # Reactor
+
 "What the heck is a Mono?"
 
 Discord4J uses a library called Reactor to facilitate reactive programming in Java. Both the concepts and the library itself can be intimidating at first. As this is a very broad topic, we have split off this documentation into other pages and defer to Reactor docs. Please see our [Reactive (Reactor) Tutorial](reactive-reactor-tutorial) and the awesome [Reactor Reference Guide](https://projectreactor.io/docs/core/release/reference/).

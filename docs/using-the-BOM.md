@@ -5,7 +5,6 @@ sidebar_label: Using the BOM
 slug: /using-the-bom
 ---
 
-
 Discord4J v3 uses a BOM or Bill of Materials as a way to coordinate dependencies that work well together, therefore providing faster and safer ways to migrate across versions.
 
 # Usage
@@ -17,7 +16,7 @@ To check available versions make sure you go to the [BOM](https://github.com/Dis
 Maven supports BOM through the `dependencyManagement` entry. You should first add this snippet to your **pom.xml** file:
 
 ```xml
-<dependencyManagement> 
+<dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.discord4j</groupId>
@@ -36,7 +35,7 @@ Then you are able to add dependencies just like normal ones, but without specify
 <dependencies>
     <dependency>
         <groupId>com.discord4j</groupId>
-        <artifactId>discord4j-core</artifactId>         
+        <artifactId>discord4j-core</artifactId>
     </dependency>
     <dependency>
         <groupId>com.discord4j</groupId>

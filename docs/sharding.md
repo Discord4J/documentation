@@ -5,7 +5,6 @@ sidebar_label: Sharding
 slug: /sharding
 ---
 
-
 # What is sharding
 
 Sharding is the process a bot guilds are split into multiple connections to the Discord Gateway. Discord requires you to have a max of 2,500 guilds per shard, but the recommended is 1 shard per thousand guilds, so as your bot scales you'll eventually need to switch to a sharding scheme.
@@ -77,7 +76,7 @@ DiscordClient.create(System.getenv("token"))
 - To make use of this pattern, you need to share the same parent `DiscordClient` to get automatically rate limit handling
 - You need to share the `ShardCoordinator` across groups to get Gateway authentication rate limits automatically handled
 - You can **optionally** share the `StoreService`, just supply the same instance to both Gateway bootstrap calls
-- Can also apply this pattern for the *same* shards to acquire two independent groups for testing, redundancy/failover, etc
+- Can also apply this pattern for the _same_ shards to acquire two independent groups for testing, redundancy/failover, etc
 
 ```java
 // the first group will get even shard IDs
@@ -116,7 +115,7 @@ If you plan to run your bot infrastructure across multiple machines, your bot ru
 
 ### Introducing [Discord4J Connect](https://github.com/Discord4J/connect)
 
-**Connect** is a project within the Discord4J organization attempting to provide distributed bot architectures over Discord4J. It goes beyond the JVM and *connects* your bot event flow across multiple middlewares to unlock your bot scaling potential.
+**Connect** is a project within the Discord4J organization attempting to provide distributed bot architectures over Discord4J. It goes beyond the JVM and _connects_ your bot event flow across multiple middlewares to unlock your bot scaling potential.
 
 Connect uses the concept of **Leader** and **Worker** to express a Discord4J bot topology:
 
@@ -155,4 +154,3 @@ Please check the [examples folder](https://github.com/Discord4J/connect/tree/mas
 ### Dedicated voice workers
 
 It is planned that Discord4J Connect supports distributed audio processing. The interfaces in the voice module exist, but they lack a distributed-capable implementation.
-

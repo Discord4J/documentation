@@ -18,8 +18,8 @@ Take a look at our [Migration Guide for v3.0](migrating-from-v3-0-to-v3-1).
 ## First steps
 
 1. If you want a step by step guide on making a bot, that guides you to making a simple
-functional bot, check out our [Basic Bot Tutorial](basic-bot-tutorial).
+   functional bot, check out our [Basic Bot Tutorial](basic-bot-tutorial).
 
 2. Read [Music Bot Tutorial](music-bot-tutorial) for a larger example. There are also
-resources to quickly setup a voice bot in our 
-[README](https://github.com/Discord4J/Discord4J#-voice-and-music).
+   resources to quickly setup a voice bot in our
+   [README](https://github.com/Discord4J/Discord4J#-voice-and-music).

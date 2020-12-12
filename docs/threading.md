@@ -5,7 +5,6 @@ sidebar_label: Threading
 slug: /threading
 ---
 
-
 # Reactor and threading
 
 ⚠️ _This is an advanced topic and expects you have read the **Threading and Schedulers** section of the Reactor reference. [Check it out](https://projectreactor.io/docs/core/release/reference/#schedulers) to familiarize yourself with its API and usage._
@@ -116,5 +115,6 @@ EventDispatcher customDispatcher = EventDispatcher.builder()
 ```
 
 The current default is creating a `ForkJoinPool`-based scheduler called `d4j-events`. If you decide to change it, these are our recommendations:
+
 - If you perform a lot of blocking and slow operations, switch to `Schedulers.boundedElastic()`.
 - If you **never** call block, perform operations that park threads like blocking HTTP libraries nor blocking I/O in general, try using `Schedulers.immediate()` to minimize thread switching.

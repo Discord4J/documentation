@@ -5,15 +5,16 @@ sidebar_label: Error Handling
 slug: /error-handling
 ---
 
-
 ℹ️ _For a more detailed source of information, please refer to [this section](https://projectreactor.io/docs/core/release/reference/#error.handling) of the Reactor reference guide._
 
 According to reactive streams specification, errors are terminal signals. This typically means any running sequence will be **terminated** and the error propagated to all operators down the chain.
 
 ## Handling Errors
+
 The following are some valid strategies for dealing with errors:
 
 ### Accept the error
+
 Error will propagate downstream until the end of the chain and then run the `onError` callback in your subscriber.
 
 You can optionally log and react on the side using `doOnError` operator.
@@ -28,7 +29,7 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
         .flatMap(Message::getChannel)
         .flatMap(channel -> channel.createMessage("Pong!"))
         .doOnError(error -> { /* You can be notified here as well! */ })
-        .subscribe(null, error -> { 
+        .subscribe(null, error -> {
             // the error signal will stop here and terminate the sequence
             System.out.println(e);
         });
@@ -76,7 +77,9 @@ Flux.just("😀", "😬", "😂", "😄")
     )
     .subscribe(); // so it won't get here
 ```
+
 If you were to place `onErrorResume` outside a `flatMap`, you'll replace the sequence, potentially missing some elements being processed:
+
 ```java
 Flux.just("😀", "😬", "😂", "😄")
     .flatMap(emoji -> message.addReaction(ReactionEmoji.unicode(emoji))) // if this fails on the 3rd emoji
@@ -91,7 +94,9 @@ Flux.just("😀", "😬", "😂", "😄")
 ✔️ This approach is good when working with `EventDispatcher` for the same reason as above. Be aware that the sequence is still on error and can be handled by a different strategy on following operators.
 
 ### [Retrying](https://projectreactor.io/docs/core/release/reference/#_retrying): `retry`, `retryWhen`
+
 Error will terminate the original sequence, but `retry()` (and [variants](https://projectreactor.io/docs/core/release/reference/#_retrying)) will **re-subscribe** to the upstream Flux. Be aware that this ultimately means that a new sequence is created.
+
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
         .map(MessageCreateEvent::getMessage)
@@ -124,14 +129,19 @@ Around `Mono` sequences, **we generally recommend sticking with resuming if you 
 Using `onErrorStop` will revert the behavior to treating errors as terminal events. This can be used to accurately scope continue strategy and avoid surprises, specially when combining it with `onErrorResume`.
 
 ## Error Sources
+
 Typical Reactor operators will throw errors if you:
+
 - Throw any `RuntimeException` inside a lambda within an operator (see [4.6.2](https://projectreactor.io/docs/core/release/reference/#_handling_exceptions_in_operators_or_functions) for an in-depth explanation)
+
 ```java
 Flux.just(1, 2, 0)
         .map(i -> "100 / " + i + " = " + (100 / i)) // this triggers an error with 0
         .subscribe();
 ```
+
 - Transform a signal into an error one
+
 ```java
 Flux.just("Mega", "Micro", "Nano")
         .flatMap(s -> {
@@ -143,7 +153,9 @@ Flux.just("Mega", "Micro", "Nano")
         })
         .subscribe();
 ```
+
 - Receive an HTTP error code (400s or 500s)
+
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
         .map(MessageCreateEvent::getMessage)
@@ -153,13 +165,17 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
         .flatMap(channel -> channel.createMessage("Pong!")) // this can fail with 403, 500, etc...
         .subscribe();
 ```
+
 - Return `null` (except some documented cases)
+
 ```java
 Flux.just(1, 2, 3)
         .map(n -> null) // illegal operation
         .subscribe();
 ```
+
 - Overflow due to not generating enough demand
+
 ```java
 // Generate a tick every 10 ms
 Flux.interval(Duration.ofMillis(10))
