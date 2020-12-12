@@ -11,7 +11,7 @@ Discord4J v3 is a completely different programming paradigm compared to v2. Rath
 
 ## Blocking
 
-The core of Discord4J's design is centered around [reactive programming](<Reactive-(Reactor)-Tutorial.md>), using Reactor as its implementation. This is primarily focused around 2 classes, `Mono` and `Flux`. While `Mono` and `Flux` are designed for asynchronous computations, they do offer synchronous conversions for more traditional imperative programming that will be familiar to v2 developers.
+The core of Discord4J's design is centered around [reactive programming](reactive-reactor-tutorial), using Reactor as its implementation. This is primarily focused around 2 classes, `Mono` and `Flux`. While `Mono` and `Flux` are designed for asynchronous computations, they do offer synchronous conversions for more traditional imperative programming that will be familiar to v2 developers.
 
 ###### ⚠️ Warning ⚠️
 

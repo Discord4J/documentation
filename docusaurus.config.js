@@ -33,7 +33,7 @@ module.exports = {
       // ],
     },
     prism: {
-      theme: require('./themes/darcula')
+      theme: require('./themes/darcula'),
     },
     footer: {
       style: 'dark',
@@ -42,12 +42,29 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
-              to: 'docs/',
+              label: 'Discord4J Docs',
+              to: '/',
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2/',
+              label: 'Javadocs',
+              href: 'https://javadoc.io/doc/com.discord4j/discord4j-core',
+            },
+          ],
+        },
+        {
+          title: 'Resources',
+          items: [
+            {
+              label: 'GitHub',
+              to: 'https://github.com/Discord4J/Discord4J',
+            },
+            {
+              label: 'Reactor Reference Guide',
+              href: 'https://projectreactor.io/docs/core/release/reference/',
+            },
+            {
+              label: 'Discord API',
+              href: 'https://discord.com/developers/docs/intro',
             },
           ],
         },
@@ -61,22 +78,12 @@ module.exports = {
             {
               html: `
               <a href="https://www.netlify.com">
-                <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg" alt="Deploys by Netlify" />
+                <img
+                  src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg"
+                  alt="Deploys by Netlify"
+                />
               </a>
-              `
-            }
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
-              to: 'blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/Discord4J/Discord4J',
+              `,
             },
           ],
         },

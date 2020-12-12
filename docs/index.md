@@ -1,5 +1,5 @@
 ---
-id: docs-index
+id: index
 title: Welcome to Discord4J Docs!
 sidebar_label: Welcome to Discord4J Docs!
 slug: /

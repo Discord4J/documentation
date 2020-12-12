@@ -1,7 +1,7 @@
 module.exports = {
   docs: {
     Discord4J: [
-      'docs-index',
+      'index',
       'getting-started',
       'basic-bot-tutorial',
       'frequently-asked-questions',
