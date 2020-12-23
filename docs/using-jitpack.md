@@ -60,4 +60,4 @@ resolvers += "jitpack.io" at "https://jitpack.io"
 
 Instead of `master-SNAPSHOT` you can also use a direct commit hash to pin your dependency, even under development builds. The commit hash can be obtained from the [list of GitHub commits](https://github.com/Discord4J/Discord4J/commits/v3):
 
-![Commit Hash](https://i.imgur.com/wd7XxOd.png)
+<img src="img/commit_hash.png" />

@@ -141,7 +141,7 @@ Please check the [examples folder](https://github.com/Discord4J/connect/tree/mas
 - Workers read from the distributed entity cache and process commands
 - Workers are not tied to any particular shard, but the payload broker/middleware can route
 
-![](https://github.com/Discord4J/connect/blob/master/distributed-discord4j-bot-writer-leaders.svg)
+<img src="img/distributed-discord4j-bot-writer-leaders.svg" />
 
 ### Thin leaders, stateless workers
 
@@ -149,7 +149,7 @@ Please check the [examples folder](https://github.com/Discord4J/connect/tree/mas
 - Workers read Gateway payloads, write to the entity cache and process commands
 - Workers are not tied to any particular shard, but the payload broker/middleware can route
 
-![](https://github.com/Discord4J/connect/blob/master/distributed-discord4j-bot-thin-leaders.svg)
+<img src="img/distributed-discord4j-bot-thin-leaders.svg" />
 
 ### Dedicated voice workers
 

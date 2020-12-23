@@ -82,7 +82,7 @@ discordClient.getEventDispatcher().on(ReadyEvent.class) // Listen for ReadyEvent
 
 Everything. Its problems stem from being the oldest of the 3 major libraries (written before a time the bot API existed) and its developer(s) having inadequate knowledge of Java conventions/practices and lacking OOP concepts.
 
-1. v2 is a completely blocking API. This means threads must "wait" for actions to be completed before continuing. This wastes a tremendous amount of resources at scale as threads could be accomplishing various other tasks as they "wait" for previous tasks to finish. As noted by [this chart](https://i.imgur.com/dioE0Fh.png), even wasting a millisecond, in relative terms, is a huge waste of time for a computer, and a typical Discord request is about 50 milliseconds. v3, thanks to Reactor, can maximize the usage of this wasted computing power to utilize less resources to accomplish more tasks.
+1. v2 is a completely blocking API. This means threads must "wait" for actions to be completed before continuing. This wastes a tremendous amount of resources at scale as threads could be accomplishing various other tasks as they "wait" for previous tasks to finish. As noted by <a href="/img/blocking_performance.png" target="_blank">this chart</a>, even wasting a millisecond, in relative terms, is a huge waste of time for a computer, and a typical Discord request is about 50 milliseconds. v3, thanks to Reactor, can maximize the usage of this wasted computing power to utilize less resources to accomplish more tasks.
 
    Of course, you do not have to utilize Reactor's asynchronous features. As previously discussed, blocking with Reactor can be easily accomplished to achieve the previous paradigm.
 
