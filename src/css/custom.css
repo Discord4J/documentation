@@ -26,10 +26,11 @@
 
 /* Appends padding to default color transition property */
 .table-of-contents__link {
-  transition: color var(--ifm-transition-fast) var(--ifm-transition-timing-default), padding var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  transition: color var(--ifm-transition-fast) var(--ifm-transition-timing-default), transform var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  display: block;
 }
 
 /* Adds padding to the current section */
 .table-of-contents__link--active {
-  padding-left: 0.5rem;
+  transform: translateX(5px);
 }
