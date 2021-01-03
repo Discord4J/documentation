@@ -35,7 +35,7 @@ If you don't have an `Event` or there isn't a way to get the entity you want fro
 
 "I can't send a message to a `Channel`, what gives?"
 
-Discord4J uses a hierarchy of types to separate the behavior of all of the different types of channels in Discord. Consider the fact that a method for sending messages doesn't make much sense for a `VoiceChannel`. Here is an overview of this hierarchy (with some of the internal details removed): ![Discord4J Channel Type Hierarchy](https://cdn.discordapp.com/attachments/451125724766535710/583071759155068928/68747470733a2f2f63646e2e646973636f72646170702e636f6d2f6174746163686d656e74732f3231303933383535323536.png)
+Discord4J uses a hierarchy of types to separate the behavior of all of the different types of channels in Discord. Consider the fact that a method for sending messages doesn't make much sense for a `VoiceChannel`. Here is an overview of this hierarchy (with some of the internal details removed): <img src="img/channel_hierarchy.png" />
 
 In general, Discord4J uses the least specific type of channel it can. For example, `Message#getChannel()` gets you a `MessageChannel` which could be any of `TextChannel`, `NewsChannel`, or `PrivateChannel`. So, what should you do if you _know_ you have one of the more specific types? Cast! This can be done in Reactor with either the [`ofType(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#ofType-java.lang.Class-) or [`cast(Class)`](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#cast-java.lang.Class-) operator. So, to get a channel which you _know_ is a `TextChannel` you could do `client.getChannelById(id).cast(TextChannel.class)`.
 
@@ -47,7 +47,7 @@ Discord4J uses a library called Reactor to facilitate reactive programming in Ja
 
 ## Do I use map or flatMap?
 
-![Do I use map or flatMap](https://cdn.discordapp.com/attachments/582222617163989052/679491828671709225/hanvZpa.png)
+<img src="img/map_or_flatmap.png" />
 
 # Building a plugin
 

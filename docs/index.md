@@ -5,7 +5,7 @@ sidebar_label: Welcome to Discord4J Docs!
 slug: /
 ---
 
-<img align="right" src="https://raw.githubusercontent.com/Discord4J/discord4j-web/master/public/logo.svg?sanitize=true" width="27%" />
+<img align="right" src="img/logo.svg" width="27%" />
 
 Welcome to the Discord4J wiki! Discord4J is a [reactive](https://www.reactivemanifesto.org/) Java wrapper for the official [Discord Bot API](https://discordapp.com/developers/docs/intro). This wiki will cover all the basics on reactive programming, how to utilize the Discord4J library effectively, and common examples in reactive and blocking contexts. Feel free to explore the various topics this wiki covers using the links in the sidebar.
 
