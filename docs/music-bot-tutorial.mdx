@@ -322,7 +322,9 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
     // to be done, but instead of blocking the thread, waiting for it
     // to finish, it will just execute the results asynchronously.
     .subscribe(event -> {
-        final String content = event.getMessage().getContent(); // 3.1 Message.getContent() is a String
+        // 3.1 Message.getContent() is a String
+        final String content = event.getMessage().getContent();
+
         for (final Map.Entry<String, Command> entry : commands.entrySet()) {
             // We will be using ! as our "prefix" to any command in the system.
             if (content.startsWith('!' + entry.getKey())) {
@@ -382,12 +384,18 @@ For `lavaplayer`: [![Bintray](https://api.bintray.com/packages/sedmelluq/com.sed
 ```java
 // Creates AudioPlayer instances and translates URLs to AudioTrack instances
 final AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-// This is an optimization strategy that Discord4J can utilize. It is not important to understand
-playerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+
+// This is an optimization strategy that Discord4J can utilize.
+// It is not important to understand
+playerManager.getConfiguration()
+    .setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+
 // Allow playerManager to parse remote sources like YouTube links
 AudioSourceManagers.registerRemoteSources(playerManager);
+
 // Create an AudioPlayer so Discord4J can receive audio data
 final AudioPlayer player = playerManager.createPlayer();
+
 // We will be creating LavaPlayerAudioProvider in the next step
 AudioProvider provider = new LavaPlayerAudioProvider(player);
 ```
@@ -405,9 +413,15 @@ public final class LavaPlayerAudioProvider extends AudioProvider {
     private final MutableAudioFrame frame = new MutableAudioFrame();
 
     public LavaPlayerAudioProvider(final AudioPlayer player) {
-        // Allocate a ByteBuffer for Discord4J's AudioProvider to hold audio data for Discord
-        super(ByteBuffer.allocate(StandardAudioDataFormats.DISCORD_OPUS.maximumChunkSize()));
-        // Set LavaPlayer's MutableAudioFrame to use the same buffer as the one we just allocated
+        // Allocate a ByteBuffer for Discord4J's AudioProvider to hold audio data
+        // for Discord
+        super(
+            ByteBuffer.allocate(
+                StandardAudioDataFormats.DISCORD_OPUS.maximumChunkSize()
+            )
+        );
+        // Set LavaPlayer's MutableAudioFrame to use the same buffer as the one we
+        // just allocated
         frame.setBuffer(getBuffer());
         this.player = player;
     }

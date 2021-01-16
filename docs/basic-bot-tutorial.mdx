@@ -77,7 +77,7 @@ public class Bot {
 
     client.getEventDispatcher().on(ReadyEvent.class)
         .subscribe(event -> {
-            User self = event.getSelf();
+            final User self = event.getSelf();
             System.out.println(String.format(
                 "Logged in as %s#%s", self.getUsername(), self.getDiscriminator()
             ));
@@ -102,12 +102,17 @@ import discord4j.core.object.entity.User;
 public class Bot {
 
   public static void main(String[] args) {
-    GatewayDiscordClient client = DiscordClientBuilder.create("TOKEN HERE").build().login().block();
+    GatewayDiscordClient client = DiscordClientBuilder.create("TOKEN HERE")
+        .build()
+        .login()
+        .block();
 
     client.getEventDispatcher().on(ReadyEvent.class)
         .subscribe(event -> {
-          User self = event.getSelf();
-          System.out.println(String.format("Logged in as %s#%s", self.getUsername(), self.getDiscriminator()));
+          final User self = event.getSelf();
+          System.out.println(String.format(
+              "Logged in as %s#%s", self.getUsername(), self.getDiscriminator()
+          ));
         });
 
     client.getEventDispatcher().on(MessageCreateEvent.class)

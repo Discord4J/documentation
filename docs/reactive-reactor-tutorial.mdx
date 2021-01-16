@@ -44,7 +44,8 @@ Let's print a simple "Hello World" reactively.
 ```java
 Mono.just("Hello World").subscribe(System.out::println);
 // or
-Flux.just('H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '\n').subscribe(System.out::print);
+Flux.just('H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '\n')
+    .subscribe(System.out::print);
 ```
 
 Breaking down the first line:

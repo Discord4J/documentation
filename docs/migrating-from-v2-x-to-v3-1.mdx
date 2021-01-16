@@ -20,7 +20,9 @@ The core of Discord4J's design is centered around [reactive programming](reactiv
 Any method that returns a `Mono` or `Flux` must be "subscribed" to in order for an action to be performed. This is vastly different compared to v2, where simply invoking the method _instantly_ caused the method to execute. To mimic that behavior, we can simply call `Mono#block`:
 
 ```java
-TextChannel channel = (TextChannel) discordClient.getChannelById(Snowflake.of(1234567890L)).block();
+TextChannel channel = (TextChannel) discordClient
+    .getChannelById(Snowflake.of(1234567890L))
+    .block();
 channel.createMessage("Hello World").block();
 ```
 
@@ -54,7 +56,7 @@ interface EventListener<T extends Event> {
     void execute(T event);
 }
 
-...
+// more code ...
 
 EventListener<MessageCreateEvent> listener = ...
 eventDispatcher.on(listener.getEventType()).subscribe(listener::execute);
@@ -73,7 +75,7 @@ discordClient.getEventDispatcher().on(ReadyEvent.class) // Listen for ReadyEvent
         .on(GuildCreateEvent.class) // Listen for GuildCreateEvent(s)
         .take(size) // Take only the first `size` GuildCreateEvent(s) to be received
         .collectList()) // Take all received GuildCreateEvents and make it a List
-    .subscribe(events -> /* All guilds have been received, client is fully connected */);
+    .subscribe(events -> /* All guilds received, and client is fully connected */);
 ```
 
 ## FAQ

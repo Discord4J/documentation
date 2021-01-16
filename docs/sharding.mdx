@@ -20,7 +20,8 @@ DiscordClient.create(System.getenv("token"))
         .gateway()
         .setSharding(ShardingStrategy.fixed(2))
         .withGateway(client -> client.on(ReadyEvent.class)
-                .doOnNext(ready -> log.info("Logged in as {}", ready.getSelf().getUsername()))
+                .doOnNext(ready ->
+                        log.info("Logged in as {}", ready.getSelf().getUsername()))
                 .then())
         .block();
 ```

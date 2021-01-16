@@ -23,16 +23,16 @@ As good practice, we encourage you to **implement the `onError` callback** when 
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
-        .map(MessageCreateEvent::getMessage)
-        .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-        .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
-        .flatMap(Message::getChannel)
-        .flatMap(channel -> channel.createMessage("Pong!"))
-        .doOnError(error -> { /* You can be notified here as well! */ })
-        .subscribe(null, error -> {
-            // the error signal will stop here and terminate the sequence
-            System.out.println(e);
-        });
+    .map(MessageCreateEvent::getMessage)
+    .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
+    .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
+    .flatMap(Message::getChannel)
+    .flatMap(channel -> channel.createMessage("Pong!"))
+    .doOnError(error -> { /* You can be notified here as well! */ })
+    .subscribe(null, error -> {
+        // the error signal will stop here and terminate the sequence
+        System.out.println(e);
+    });
 ```
 
 ⚠️ Taking this approach under `EventDispatcher` sequences will terminate your subscription, missing all further events for that subscriber. In general, this is a poor solution if you wish to perform extra behavior like starting another chain.
@@ -45,17 +45,17 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
-        .map(MessageCreateEvent::getMessage)
-        .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-        .filter(message -> message.getContent().startsWith("!user "))
-        .flatMap(message -> Mono.just(message.getContent())
-                .map(content -> content.split(" ", 2))
-                .flatMap(tokens -> message.getClient().getUserById(Snowflake.of(tokens[1])))
-                .map(user -> user.getUsername() + "#" + user.getDiscriminator())
-                .onErrorReturn("Could not find that user") // Replace any error with this message
-                .flatMap(name -> message.getChannel()
-                        .flatMap(channel -> channel.createMessage(name))))
-        .subscribe(null, System.out::println);
+    .map(MessageCreateEvent::getMessage)
+    .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
+    .filter(message -> message.getContent().startsWith("!user "))
+    .flatMap(message -> Mono.just(message.getContent())
+        .map(content -> content.split(" ", 2))
+        .flatMap(tokens -> message.getClient().getUserById(Snowflake.of(tokens[1])))
+        .map(user -> user.getUsername() + "#" + user.getDiscriminator())
+            .onErrorReturn("Could not find that user") // Replaces errors with this msg
+        .flatMap(name -> message.getChannel()
+            .flatMap(channel -> channel.createMessage(name))))
+    .subscribe(null, System.out::println);
 ```
 
 onErrorReturn has overloads to include a condition so you could for example use the following to only recover from `404` status errors (Not found):
@@ -73,7 +73,7 @@ onErrorReturn has overloads to include a condition so you could for example use 
 ```java
 Flux.just("😀", "😬", "😂", "😄")
     .flatMap(emoji -> message.addReaction(ReactionEmoji.unicode(emoji))
-            .onErrorResume(e -> Mono.empty()) // error is discarded
+        .onErrorResume(e -> Mono.empty()) // error is discarded
     )
     .subscribe(); // so it won't get here
 ```
@@ -82,9 +82,15 @@ If you were to place `onErrorResume` outside a `flatMap`, you'll replace the seq
 
 ```java
 Flux.just("😀", "😬", "😂", "😄")
-    .flatMap(emoji -> message.addReaction(ReactionEmoji.unicode(emoji))) // if this fails on the 3rd emoji
-    .onErrorResume(e -> Mono.empty()) // you'll replace the sequence with an empty one, and miss the last one
-    .subscribe(); // but the error still won't reach here!
+
+    // if this fails on the 3rd emoji
+    .flatMap(emoji -> message.addReaction(ReactionEmoji.unicode(emoji)))
+
+    // you'll replace the sequence with an empty one, and miss the last one
+    .onErrorResume(e -> Mono.empty())
+
+    // but the error still won't reach here!
+    .subscribe();
 ```
 
 ### [Catch and Rethrow](https://projectreactor.io/docs/core/release/reference/#_catch_and_rethrow): `onErrorMap`
@@ -99,13 +105,13 @@ Error will terminate the original sequence, but `retry()` (and [variants](https:
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
-        .map(MessageCreateEvent::getMessage)
-        .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-        .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
-        .flatMap(Message::getChannel)
-        .flatMap(channel -> channel.createMessage("Pong!"))
-        .retry()
-        .subscribe();
+    .map(MessageCreateEvent::getMessage)
+    .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
+    .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
+    .flatMap(Message::getChannel)
+    .flatMap(channel -> channel.createMessage("Pong!"))
+    .retry()
+    .subscribe();
 ```
 
 ⚠️ This approach is generally appropriate for API requests, but there are certain errors you should not retry. By default, Discord4J retries some errors for you, using an exponential backoff with jitter strategy.
@@ -136,42 +142,42 @@ Typical Reactor operators will throw errors if you:
 
 ```java
 Flux.just(1, 2, 0)
-        .map(i -> "100 / " + i + " = " + (100 / i)) // this triggers an error with 0
-        .subscribe();
+    .map(i -> "100 / " + i + " = " + (100 / i)) // this triggers an error with 0
+    .subscribe();
 ```
 
 - Transform a signal into an error one
 
 ```java
 Flux.just("Mega", "Micro", "Nano")
-        .flatMap(s -> {
-            if (s.startsWith("M")) {
-                return Mono.just(s);
-            } else {
-                return Mono.error(new RuntimeException());
-            }
-        })
-        .subscribe();
+    .flatMap(s -> {
+        if (s.startsWith("M")) {
+            return Mono.just(s);
+        } else {
+            return Mono.error(new RuntimeException());
+        }
+    })
+    .subscribe();
 ```
 
 - Receive an HTTP error code (400s or 500s)
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
-        .map(MessageCreateEvent::getMessage)
-        .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-        .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
-        .flatMap(Message::getChannel)
-        .flatMap(channel -> channel.createMessage("Pong!")) // this can fail with 403, 500, etc...
-        .subscribe();
+    .map(MessageCreateEvent::getMessage)
+    .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
+    .filter(message -> message.getContent().equalsIgnoreCase("!ping"))
+    .flatMap(Message::getChannel)
+    .flatMap(channel -> channel.createMessage("Pong!")) // can fail with 403, 500, ...
+    .subscribe();
 ```
 
 - Return `null` (except some documented cases)
 
 ```java
 Flux.just(1, 2, 3)
-        .map(n -> null) // illegal operation
-        .subscribe();
+    .map(n -> null) // illegal operation
+    .subscribe();
 ```
 
 - Overflow due to not generating enough demand
@@ -179,9 +185,9 @@ Flux.just(1, 2, 3)
 ```java
 // Generate a tick every 10 ms
 Flux.interval(Duration.ofMillis(10))
-        //.onBackpressureDrop() // uncommenting this avoids the error: drop tick if consumer is choked
-        .flatMap(tick -> Mono.never()) // would "never" consume the upstream ticks, overflows
-        .subscribe();
+    //.onBackpressureDrop() // uncommenting this avoids the error: drop tick if consumer is choked
+    .flatMap(tick -> Mono.never()) // would "never" consume the upstream ticks, overflows
+    .subscribe();
 ```
 
 ## Handling errors across multiple requests using Discord4J
@@ -205,17 +211,26 @@ public class ExampleClientResponse {
 
     public static void main(String[] args) {
         DiscordClient client = DiscordClientBuilder.create(token)
-                // globally suppress any not found (404) error
-                .onClientResponse(ResponseFunction.emptyIfNotFound())
-                // bad requests (400) while adding reactions will be suppressed
-                .onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.route(Routes.REACTION_CREATE), 400))
-                // server error (500) while creating a message will be retried, with backoff, until it succeeds
-                .onClientResponse(ResponseFunction.retryWhen(RouteMatcher.route(Routes.MESSAGE_CREATE),
+            // globally suppress any not found (404) error
+            .onClientResponse(ResponseFunction.emptyIfNotFound())
+            // bad requests (400) while adding reactions will be suppressed
+            .onClientResponse(ResponseFunction.emptyOnErrorStatus(
+                    RouteMatcher.route(Routes.REACTION_CREATE), 400)
+            )
+            // server error (500) while creating a message will be retried with backoff
+            // until it succeeds
+            .onClientResponse(
+                ResponseFunction.retryWhen(
+                        RouteMatcher.route(Routes.MESSAGE_CREATE),
                         Retry.onlyIf(ClientException.isRetryContextStatusCode(500))
-                                .exponentialBackoffWithJitter(Duration.ofSeconds(2), Duration.ofSeconds(10))))
-                // wait 1 second and retry any server error (500)
-                .onClientResponse(ResponseFunction.retryOnceOnErrorStatus(500))
-                .build();
+                            .exponentialBackoffWithJitter(
+                                Duration.ofSeconds(2), Duration.ofSeconds(10)
+                            )
+                )
+            )
+            // wait 1 second and retry any server error (500)
+            .onClientResponse(ResponseFunction.retryOnceOnErrorStatus(500))
+            .build();
     }
 }
 ```

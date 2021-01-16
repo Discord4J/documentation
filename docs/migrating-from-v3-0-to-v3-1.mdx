@@ -62,7 +62,9 @@ DiscordClientBuilder.create(System.getenv("token"))
     .build()
     .withGateway(client -> {
         client.getEventDispatcher().on(ReadyEvent.class)
-                .subscribe(ready -> System.out.println("Logged in as " + ready.getSelf().getUsername()));
+                .subscribe(ready -> 
+                    System.out.println("Logged in as " + ready.getSelf().getUsername())
+                );
 
         client.getEventDispatcher().on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
@@ -85,8 +87,11 @@ DiscordClientBuilder.create(System.getenv("token"))
         .build()
         .withGateway(client -> {
             Mono<Void> onReady = client.getEventDispatcher().on(ReadyEvent.class)
-                    .doOnNext(ready -> System.out.println("Logged in as " + ready.getSelf().getUsername()))
-                    .then();
+                    .doOnNext(ready ->
+                        System.out.println(
+                            "Logged in as " + ready.getSelf().getUsername()
+                        )
+                    ).then();
 
             Mono<Void> ping = client.getEventDispatcher().on(MessageCreateEvent.class)
                     .map(MessageCreateEvent::getMessage)
@@ -114,7 +119,9 @@ DiscordClient client = DiscordClient.create(System.getenv("token")); // <1>
 GatewayDiscordClient gateway = client.login().block(); // <2>
 
 gateway.on(ReadyEvent.class) // <3>
-        .subscribe(ready -> System.out.println("Logged in as " + ready.getSelf().getUsername()));
+        .subscribe(ready ->
+            System.out.println("Logged in as " + ready.getSelf().getUsername())
+        );
 
 gateway.onDisconnect().block(); // <4>
 ```
@@ -130,10 +137,14 @@ You can also connect using a traditional `flatMap` style, but if you're going th
 DiscordClient client = DiscordClient.create(System.getenv("token"));
 client.withGateway(gateway -> {
     Flux<ReadyEvent> hello = gateway.on(ReadyEvent.class)
-            .doOnNext(ready -> System.out.println("Logged in as " + ready.getSelf().getUsername()));
+            .doOnNext(ready ->
+                System.out.println("Logged in as " + ready.getSelf().getUsername())
+            );
 
     Flux<MessageCreateEvent> messages = gateway.on(MessageCreateEvent.class)
-            .doOnNext(event -> System.out.println("> " + event.getMessage().getContent()));
+            .doOnNext(event ->
+                System.out.println("> " + event.getMessage().getContent())
+            );
 
     return Mono.when(hello, messages); // <1>
 }).block(); // <2>
@@ -159,7 +170,10 @@ gateway.on(MessageCreateEvent.class)
 // Alternative 2
 gateway.on(MessageCreateEvent.class,
         event -> Mono.just(event.getMessage())
-                .filter(message -> Optional.of(message.getContent()).map("!ping"::equals).orElse(false))
+                .filter(message -> 
+                    Optional.of(message.getContent())
+                        .map("!ping"::equals)
+                        .orElse(false))
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage("Pong!")))
         .subscribe(); // <2>

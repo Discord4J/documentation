@@ -27,8 +27,11 @@ One may note that all `Spec` instances have an `asRequest` method. This method i
 ```java
 Mono<Message> message = messageChannel.createMessage(messageSpec -> {
     messageSpec.setContent("Content not in an embed!");
-    // You can see in this example even with simple singular property defining specs the syntax is concise
-    messageSpec.setEmbed(embedSpec -> embedSpec.setDescription("Description is in an embed!"));
+    // You can see in this example, even with simple singular property defining specs
+    // the syntax is concise
+    messageSpec.setEmbed(embedSpec ->
+        embedSpec.setDescription("Description is in an embed!")
+    );
 });
 ```
 
@@ -41,8 +44,11 @@ Consumer<EmbedCreateSpec> template = spec -> {
     // Edit the spec as you normally would
 };
 ...
-// embedSpec can be edited as you normally would, but the edits from template will already be applied
-Mono<Message> message = messageChannel.createMessage(messageSpec -> messageSpec.setEmbed(template.andThen(embedSpec -> {})));
+// embedSpec can be edited as you normally would, but the edits from template will
+// already be applied
+Mono<Message> message = messageChannel.createMessage(messageSpec ->
+    messageSpec.setEmbed(template.andThen(embedSpec -> {}))
+);
 ```
 
 This pattern additionally helps protect the end-user from accidentally sharing specs across multiple invocations, as the state is never "reset" and mutating `Spec` instances is **not** thread-safe.

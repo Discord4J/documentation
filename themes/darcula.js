@@ -5,9 +5,15 @@ const theme = {
   },
   styles: [
     {
-      types: ['prolog', 'comment', 'cdata'],
+      types: ['prolog', 'cdata'],
       style: {
         color: 'rgb(189, 147, 249)',
+      },
+    },
+    {
+      types: ['comment'],
+      style: {
+        color: '#808080'
       },
     },
     {

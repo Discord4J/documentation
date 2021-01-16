@@ -33,21 +33,22 @@ An instance is created per `DiscordClient` and they can be shared if created ext
 
 ```java
 ReactorResources reactorResources = ReactorResources.builder()
-        .timerTaskScheduler(Schedulers.newParallel("my-scheduler"))
-        .blockingTaskScheduler(Schedulers.boundedElastic())
-        .build();
+    .timerTaskScheduler(Schedulers.newParallel("my-scheduler"))
+    .blockingTaskScheduler(Schedulers.boundedElastic())
+    .build();
+
 DiscordClient discordClient = DiscordClientBuilder.create("TOKEN")
-        .setReactorResources(reactorResources)
-        .build();
+    .setReactorResources(reactorResources)
+    .build();
 ```
 
 ### Replacing Schedulers
 
 ```java
 ReactorResources reactorResources = ReactorResources.builder()
-        .timerTaskScheduler(Schedulers.newParallel("my-scheduler"))
-        .blockingTaskScheduler(Schedulers.boundedElastic())
-        .build();
+    .timerTaskScheduler(Schedulers.newParallel("my-scheduler"))
+    .blockingTaskScheduler(Schedulers.boundedElastic())
+    .build();
 ```
 
 #### `timerTaskScheduler`
@@ -77,10 +78,10 @@ You can customize the resources used exclusively for Gateway through the bootstr
 
 ```java
 GatewayDiscordClient client = DiscordClient.create("TOKEN")
-        .gateway()
-        .setGatewayReactorResources(reactorResources -> new GatewayReactorResources(...))
-        .login()
-        .block();
+    .gateway()
+    .setGatewayReactorResources(reactorResources -> new GatewayReactorResources(...))
+    .login()
+    .block();
 ```
 
 A `GatewayReactorResources` has an extra scheduler for dedicated Gateway payload sending. If not overridden, it will use a dedicated single scheduler called `d4j-gateway`. Can be created through `GatewayReactorResources::DEFAULT_PAYLOAD_SENDER_SCHEDULER`.
@@ -89,10 +90,10 @@ The same can be done for voice:
 
 ```java
 GatewayDiscordClient client = DiscordClient.create("TOKEN")
-        .gateway()
-        .setVoiceReactorResources(reactorResources -> new VoiceReactorResources(...))
-        .login()
-        .block();
+    .gateway()
+    .setVoiceReactorResources(reactorResources -> new VoiceReactorResources(...))
+    .login()
+    .block();
 ```
 
 A `VoiceGatewayResources` requires extra parameters due to all concurrent tasks it needs to keep. Among them:
@@ -110,8 +111,8 @@ Acquire a builder using `EventDispatcher::builder` and customize its scheduler u
 
 ```java
 EventDispatcher customDispatcher = EventDispatcher.builder()
-        .eventScheduler(Schedulers.boundedElastic())
-        .build();
+    .eventScheduler(Schedulers.boundedElastic())
+    .build();
 ```
 
 The current default is creating a `ForkJoinPool`-based scheduler called `d4j-events`. If you decide to change it, these are our recommendations:
