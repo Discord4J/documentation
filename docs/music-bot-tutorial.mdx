@@ -40,19 +40,19 @@ Before coding, we need to create and setup a project with Discord4J installed. T
 #### Step 1
 
 Open IntelliJ and select **Create New Project**.
-<img src="img/music_bot/ij_create_project.png" />
+<img src="/img/music_bot/ij_create_project.png" />
 
 ---
 
 #### Step 2
 
 Select **Maven**. [Maven](https://maven.apache.org/) is a software project management and comprehension tool. Alongside its main competitor [Gradle](https://gradle.org/), Maven is practically required and essential for all Java development projects both personal and professional. It is what will enable us to install Discord4J and its dependencies along with any other dependencies and dependencies of those dependencies easily and with minimal effort.
-<img src="img/music_bot/ij_create_project_maven.png" />
+<img src="/img/music_bot/ij_create_project_maven.png" />
 
 ⚠️ If _Project SDK_ is blank, click **New** and navigate to a directory where a JDK is present and click **OK**.
 
-<img src="img/music_bot/ij_project_sdk.png" />
-<img src="img/music_bot/ij_project_sdk_select.png" />
+<img src="/img/music_bot/ij_project_sdk.png" />
+<img src="/img/music_bot/ij_project_sdk_select.png" />
 
 ---
 
@@ -61,21 +61,21 @@ Select **Maven**. [Maven](https://maven.apache.org/) is a software project manag
 Click **Next**, and you'll be required to provide a _GroupId_, _ArtifactId_, and _Version_. Refer to this [link](https://maven.apache.org/guides/mini/guide-naming-conventions.html) for a detailed explanation of each of these attributes. After you are done providing your attributes, select **Next**.
 
 I will be using the reverse domain name of GitHub as my _GroupId_ with an addition of my username and the name of the project (DMusic, for Discord Music). The _ArtifactId_ will be "dmusic" as I expect an outputted jar to be referred to as "dmusic.jar". Finally, as for the _Version_, since this is an application, not a library, I prefer using a date-based versioning scheme, particularly `YEAR.MONTH.DAY`.
-<img src="img/music_bot/ij_project_version.png" />
+<img src="/img/music_bot/ij_project_version.png" />
 
 ---
 
 #### Step 4
 
 This page will ask for a _Project Name_. You may leave it as the default (it automatically takes from the _ArtifactId_), but I personally prefer having proper capitalization when working in IntelliJ. After you have chosen, select **Finish**.
-<img src="img/music_bot/ij_project_name.png" />
+<img src="/img/music_bot/ij_project_name.png" />
 
 ---
 
 #### Step 5
 
 Once IntelliJ has created the project, a dialog box will appear in the bottom-right corner. Select **Enable Auto-Import**. This will have IntelliJ automatically install dependencies like Discord4J after we request for them, rather than needing to manually refresh the project.
-<img src="img/music_bot/ij_maven_auto_import.png" />
+<img src="/img/music_bot/ij_maven_auto_import.png" />
 
 ---
 
@@ -89,14 +89,14 @@ Important: Version numbers shown in these images might be outdated, always prefe
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
 
-<img src="img/music_bot/ij_maven_versionnum.png" />
+<img src="/img/music_bot/ij_maven_versionnum.png" />
 
 ---
 
 #### Step 7
 
 Under **External Libraries** on the navigation pane, `discord4j-core` should be present. This means Discord4J has been properly imported, and we are ready to utilize it in our project!
-<img src="img/music_bot/ij_maven_external_libraries.png" />
+<img src="/img/music_bot/ij_maven_external_libraries.png" />
 
 ---
 
@@ -109,28 +109,28 @@ Once IntelliJ is configured for Maven with Discord4J installed we can finally st
 #### Step 8
 
 **Right click** on **src/main/java** in the _Project View_ and **select** the **New -> Package** option. This will allow us to create a base package for us to work with and acts as a starting point to help organize our code.
-<img src="img/music_bot/ij_create_package.png" />
+<img src="/img/music_bot/ij_create_package.png" />
 
 ---
 
 #### Step 9
 
 You should choose a package structure equal to the _GroupId_ that you provided back in Step 3.
-<img src="img/music_bot/ij_package_name.png" />
+<img src="/img/music_bot/ij_package_name.png" />
 
 ---
 
 #### Step 10
 
 **Right click** on the last folder of your package structure and **select** the **New -> Java Class** option. We will now refer to this specific folder as the _root package_. For example, `dmusic` for my project is considered the _root package_.
-<img src="img/music_bot/ij_create_java_class.png" />
+<img src="/img/music_bot/ij_create_java_class.png" />
 
 ---
 
 #### Step 11
 
 Choose a class name. It will contain our main method and as a personal preference I like having such classes equal the name of my application.
-<img src="img/music_bot/ij_class_name.png" />
+<img src="/img/music_bot/ij_class_name.png" />
 
 ---
 
@@ -167,21 +167,21 @@ client.onDisconnect().block();
 #### Step 13
 
 **Click** on the **green arrow** next to the **main** method and **select** the **Run** option.
-<img src="img/music_bot/ij_run.png" />
+<img src="/img/music_bot/ij_run.png" />
 
 ---
 
 #### Step 14
 
 After IntelliJ compiles your program and starts, you'll immediately encounter an `ArrayIndexOutOfBoundsException`. This is because we haven't provided any arguments for our program yet so `args[0]` is invalid! So let's fix that. In the **top right** corner go into the **Edit Configurations...** menu.
-<img src="img/music_bot/ij_edit_configurations.png" />
+<img src="/img/music_bot/ij_edit_configurations.png" />
 
 ---
 
 #### Step 15
 
 **Add** your bot token to _Program arguments_ and click **Apply** then **OK**.
-<img src="img/music_bot/ij_program_arguments.png" />
+<img src="/img/music_bot/ij_program_arguments.png" />
 
 ---
 
@@ -191,7 +191,7 @@ After IntelliJ compiles your program and starts, you'll immediately encounter an
 
 `https://discord.com/oauth2/authorize?client_id=CLIENTID&scope=bot`
 
-<img src="img/music_bot/ij_console.png" />
+<img src="/img/music_bot/ij_console.png" />
 
 ---
 
@@ -373,7 +373,7 @@ For `discord4j-core`: [![Maven Central](https://img.shields.io/maven-central/v/c
 
 For `lavaplayer`: [![Bintray](https://api.bintray.com/packages/sedmelluq/com.sedmelluq/lavaplayer/images/download.svg)](https://bintray.com/sedmelluq/com.sedmelluq/lavaplayer)
 
-<img src="img/music_bot/ij_maven_lavaplayer.png" />
+<img src="/img/music_bot/ij_maven_lavaplayer.png" />
 
 ---
 
