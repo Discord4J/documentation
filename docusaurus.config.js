@@ -11,6 +11,11 @@ module.exports = {
   projectName: 'Discord4J',
   plugins: ['docusaurus-tailwindcss-loader'],
   themeConfig: {
+    algolia: {
+      apiKey: 'd316a3c1f2d192cf0e0386d40947c6ff',
+      indexName: 'prod_Discord4J',
+      contextualSearch: false,
+    },
     navbar: {
       title: 'Discord4J',
       logo: {
