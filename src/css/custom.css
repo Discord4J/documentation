@@ -34,3 +34,9 @@
 .table-of-contents__link--active {
   transform: translateX(5px);
 }
+
+/* Margin for navbar */
+.navbar__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+}
