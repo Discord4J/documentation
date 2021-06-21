@@ -51,9 +51,9 @@ Discord4J uses a library called Reactor to facilitate reactive programming in Ja
 
 # Building a plugin
 
-## I'm getting java.lang.NoSuchMethodError: io.netty...
+## I'm getting java.lang.NoSuchMethodError: io.netty... or java.lang.NoClassDefFoundError: com.fasterxml...
 
-If you're trying to build a Minecraft plugin with Discord4J, you'll have a conflict with the netty version both provide. Discord4J uses newer netty methods that don't exist in Minecraft's version, therefore you must use a technique called "Shading" to make your plugin ship the latest netty.
+If you're trying to build a Minecraft plugin with Discord4J, you'll have a conflict with versions both depend on. Discord4J uses newer Netty and Jackson methods that don't exist in Minecraft's version, therefore you must use a technique called **Shading** to make your plugin ship the ones used by Discord4J.
 
 This can be achieved through Maven or Gradle
 
@@ -79,6 +79,10 @@ Use [maven-shade-plugin](https://rmannibucau.metawerx.net/post/mavens-shade-plug
             <pattern>io.netty</pattern>
             <shadedPattern>com.discord4j.shaded.io.netty</shadedPattern>
           </relocation>
+          <relocation>
+            <pattern>com.fasterxml</pattern>
+            <shadedPattern>com.discord4j.shaded.com.fasterxml</shadedPattern>
+          </relocation>
         </relocations>
       </configuration>
     </execution>
@@ -101,7 +105,8 @@ plugins {
 
 // Relocating a Package
 shadowJar {
-   relocate 'io.netty', 'com.discord4j.shaded.io.netty'
+  relocate 'io.netty', 'com.discord4j.shaded.io.netty'
+  relocate 'com.fasterxml', 'com.discord4j.shaded.com.fasterxml'
 }
 ```
 
