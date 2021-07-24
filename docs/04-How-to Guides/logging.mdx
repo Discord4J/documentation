@@ -5,6 +5,53 @@ sidebar_label: Logging
 slug: /logging
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+While optional, we do recommend installing and configuring a logging implementation to aid in debugging and provide useful information for day-to-day operations; plus, it's [good practice](https://softwareengineering.stackexchange.com/questions/37294/logging-why-and-what). Discord4J uses Reactor's [logging implementation](https://projectreactor.io/docs/core/release/reference/#_logging_a_sequence), which is compatible with any [SLF4J](https://www.slf4j.org/) implementation. We recommend using [Logback](https://logback.qos.ch/) for maximum flexibility and customization.
+
+<Tabs
+  defaultValue="gradle"
+  values={[
+    { label: 'Gradle', value: 'gradle', },
+    { label: 'Maven', value: 'maven', },
+    { label: 'SBT', value: 'sbt', },
+  ]
+}>
+<TabItem value="gradle">
+
+```groovy
+dependencies {
+  implementation 'ch.qos.logback:logback-classic:$logback_version'
+}
+```
+
+</TabItem>
+
+<TabItem value="maven">
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>${logback_version}</version>
+  </dependency>
+</dependencies>
+```
+
+</TabItem>
+<TabItem value="sbt">
+
+```scala
+libraryDependencies ++= Seq(
+  "ch.qos.logback" % "logback-classic" % s"$logbackVersion"
+)
+```
+
+</TabItem>
+</Tabs>
+
 ## Implementation
 
 Discord4J utilizes logging throughout their modules that will be forwarded to your implementation of choice, according to Reactor [`Loggers`](https://projectreactor.io/docs/core/release/api/reactor/util/Loggers.html) class which picks up common logging frameworks on the startup and configures logging appropriately.

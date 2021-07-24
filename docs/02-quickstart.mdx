@@ -1,0 +1,79 @@
+---
+id: quickstart
+title: Quickstart with Discord4J
+sidebar_label: Quickstart
+slug: /quickstart
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Learn how to install Discord4J and where to go next to get a bot up and running.
+
+## Download / Installation
+
+The recommended way to get Discord4J is to use a build automation tool like [Gradle](https://gradle.org/) or
+[Maven](https://maven.apache.org/). Use the appropriate snippet below for your preferred dependency manager. 
+
+:::tip
+Replace `VERSION` with your desired version from the table below.
+:::
+
+<Tabs
+  defaultValue="gradle"
+  values={[
+    { label: 'Gradle', value: 'gradle', },
+    { label: 'Maven', value: 'maven', },
+    { label: 'SBT', value: 'sbt', },
+  ]
+}>
+<TabItem value="gradle">
+
+```groovy
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.discord4j:discord4j-core:VERSION'
+}
+```
+
+</TabItem>
+
+<TabItem value="maven">
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>com.discord4j</groupId>
+    <artifactId>discord4j-core</artifactId>
+    <version>VERSION</version>
+  </dependency>
+</dependencies>
+```
+
+</TabItem>
+<TabItem value="sbt">
+
+```scala
+libraryDependencies ++= Seq(
+  "com.discord4j" % "discord4j-core" % "VERSION"
+)
+```
+
+</TabItem>
+</Tabs>
+
+### Versions
+Different versions of Discord4J support different versions of the Discord API (and enjoy different levels of support
+from the D4J maintainers). This table summarizes the currently-supported versions of Discord4J. If you're not sure
+which one to use, go for the "Current" one according to the "Support" column.
+
+| Discord4J                                                    | Support          | Gateway/API | Intents                           | Artifact VERSION                                                                                                                                                                  |
+| ------------------------------------------------------------ | ---------------- | ----------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/master) | In development   | v8          | Mandatory, non-privileged default | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.2.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Current          | v6          | Optional, no intent default       | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+| [v3.0.x](https://github.com/Discord4J/Discord4J/tree/3.0.x)  | Maintenance only | v6          | No intents support                | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.0.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+
+If you prefer using experimental, "bleeding-edge", unstable builds, refer to [Using Jitpack](using-jitpack).
