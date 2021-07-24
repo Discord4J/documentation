@@ -16,7 +16,7 @@ The recommended way to get Discord4J is to use a build automation tool like [Gra
 [Maven](https://maven.apache.org/). Use the appropriate snippet below for your preferred dependency manager. 
 
 :::tip
-Replace `VERSION` with your desired version from the table below.
+Replace `VERSION` with the current version from Maven Central. [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
 :::
 
 <Tabs
@@ -64,19 +64,6 @@ libraryDependencies ++= Seq(
 
 </TabItem>
 </Tabs>
-
-### Versions
-Different versions of Discord4J support different versions of the Discord API and enjoy different levels of support
-from the D4J maintainers. This table summarizes the most-recent versions of Discord4J. If you're not sure
-which one to use, go for the "Current" one according to the "Support" column.
-
-| Discord4J                                                    | Support          | Gateway/API | Intents                           | Artifact VERSION                                                                                                                                                                  |
-| ------------------------------------------------------------ | ---------------- | ----------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/master) | In development   | v8          | Mandatory, non-privileged default | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.2.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
-| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Current          | v6          | Optional, no intent default       | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
-| [v3.0.x](https://github.com/Discord4J/Discord4J/tree/3.0.x)  | Maintenance only | v6          | No intents support                | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.0.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
-
-If you want to use experimental snapshot versions , refer to [Using Snapshots](using-snapshots).
 
 ## Basic Bot
 With D4J installed, you can start writing your bot! Here's an example of a dead-simple "ping-pong" bot which simply
