@@ -66,8 +66,8 @@ libraryDependencies ++= Seq(
 </Tabs>
 
 ### Versions
-Different versions of Discord4J support different versions of the Discord API (and enjoy different levels of support
-from the D4J maintainers). This table summarizes the currently-supported versions of Discord4J. If you're not sure
+Different versions of Discord4J support different versions of the Discord API and enjoy different levels of support
+from the D4J maintainers. This table summarizes the most-recent versions of Discord4J. If you're not sure
 which one to use, go for the "Current" one according to the "Support" column.
 
 | Discord4J                                                    | Support          | Gateway/API | Intents                           | Artifact VERSION                                                                                                                                                                  |
@@ -76,4 +76,28 @@ which one to use, go for the "Current" one according to the "Support" column.
 | [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Current          | v6          | Optional, no intent default       | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
 | [v3.0.x](https://github.com/Discord4J/Discord4J/tree/3.0.x)  | Maintenance only | v6          | No intents support                | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.0.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
 
-If you prefer using experimental, "bleeding-edge", unstable builds, refer to [Using Jitpack](using-jitpack).
+If you want to use experimental snapshot versions , refer to [Using Snapshots](using-snapshots).
+
+## Basic Bot
+With D4J installed, you can start writing your bot! Here's an example of a dead-simple "ping-pong" bot which simply
+responds "Pong!" any time someone sends "!ping".
+
+```java
+DiscordClient.create("TOKEN")
+    .withGateway(client ->
+        client.on(MessageCreateEvent.class, event -> {
+          Message message = event.getMessage();
+
+          if (message.getContent().equalsIgnoreCase("!ping")) {
+            return message.getChannel()
+                .flatMap(channel -> channel.createMessage("Pong!"));
+          }
+
+          return Mono.empty();
+        }))
+    .block();
+```
+
+This basic example is easily extended to do all kinds of commands!
+
+See the [Basic Bot Tutorial](basic-bot-tutorial) for an in-depth explanation of this example.
