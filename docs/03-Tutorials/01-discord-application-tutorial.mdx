@@ -1,0 +1,35 @@
+---
+id: discord-application-tutorial
+title: Creating a Discord Application
+sidebar_label: Creating a Discord Application
+slug: /discord-application-tutorial
+---
+
+Learn how to create a Discord application, add a bot to that application, and invite that bot to a server.
+
+## Create a Discord Application
+
+Before writing any code, we need to tell Discord that our bot exists. We do this by creating an "application" in the
+[Discord Developer Portal](https://discord.com/developers/applications).
+
+1. Go to the developer portal and login
+2. Click "New Application"
+3. Enter a name (select "Personal" for team unless you're using [Teams](https://link)
+4. Add a bot to the new application by going to the "Bot" settings on the left and clicking "Add Bot"
+
+Congrats! You now have a bot account that you can invite to servers and login to with Discord4J.
+
+## Adding the bot to servers
+
+Just like normal users, bots can't interact with a server unless they have joined it. Unlike normal users, a bot can't
+join a server on its own. Instead, it has to be added to the server by someone with permissions to do so.
+
+This is done with an invite link that looks like this:
+```
+https://discord.com/api/oauth2/authorize?client_id=868739980447608892&scope=bot
+```
+
+To invite your newly-created bot, replace the value after `client_id=` with the client ID from the "OAuth2" settings
+page of the developer portal. Then, visit the link in a browser and select the server you want to add the bot to.
+
+The bot should now show up in the member list of the server you selected!
