@@ -39,7 +39,7 @@ module.exports = {
     },
     prism: {
       theme: require('./themes/darcula'),
-      additionalLanguages: ['groovy', 'scala']
+      additionalLanguages: ['groovy', 'java', 'scala']
     },
     footer: {
       style: 'dark',
