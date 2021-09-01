@@ -132,7 +132,9 @@ Afterwards, apply it to your `logback.xml`, for example the following would only
 
 ```xml
 <configuration>
+    <logger name="discord4j.gateway.protocol.receiver" level="TRACE"/>
     <turboFilter class="discord4j.core.logback.GatewayEventFilter">
+        <Logger>discord4j.gateway.protocol.receiver</Logger>
         <Include>MESSAGE_CREATE</Include>
     </turboFilter>
     ...
@@ -142,7 +144,9 @@ While this one would show all events except presence updates:
 
 ```xml
 <configuration>
+    <logger name="discord4j.gateway.protocol.receiver" level="TRACE"/>
     <turboFilter class="discord4j.core.logback.GatewayEventFilter">
+        <Logger>discord4j.gateway.protocol.receiver</Logger>
         <Exclude>PRESENCE_UPDATE</Exclude>
     </turboFilter>
     ...
