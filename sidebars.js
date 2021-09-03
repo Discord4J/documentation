@@ -3,6 +3,7 @@ module.exports = {
     Discord4J: ['index'],
     'Getting Started': [
       'getting-started',
+      'examples',
       'basic-bot-tutorial',
       'frequently-asked-questions',
 
