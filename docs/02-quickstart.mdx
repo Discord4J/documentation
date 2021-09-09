@@ -1,0 +1,90 @@
+---
+id: quickstart
+title: Quickstart with Discord4J
+sidebar_label: Quickstart
+slug: /quickstart
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Learn how to install Discord4J and where to go next to get a bot up and running.
+
+## Download / Installation
+
+The recommended way to get Discord4J is to use a build automation tool like [Gradle](https://gradle.org/) or
+[Maven](https://maven.apache.org/). Use the appropriate snippet below for your preferred dependency manager. 
+
+:::tip
+Replace `VERSION` with the current version from Maven Central. [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
+:::
+
+<Tabs
+  defaultValue="gradle"
+  values={[
+    { label: 'Gradle', value: 'gradle', },
+    { label: 'Maven', value: 'maven', },
+    { label: 'SBT', value: 'sbt', },
+  ]
+}>
+<TabItem value="gradle">
+
+```groovy
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.discord4j:discord4j-core:VERSION'
+}
+```
+
+</TabItem>
+
+<TabItem value="maven">
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>com.discord4j</groupId>
+    <artifactId>discord4j-core</artifactId>
+    <version>VERSION</version>
+  </dependency>
+</dependencies>
+```
+
+</TabItem>
+<TabItem value="sbt">
+
+```scala
+libraryDependencies ++= Seq(
+  "com.discord4j" % "discord4j-core" % "VERSION"
+)
+```
+
+</TabItem>
+</Tabs>
+
+## Basic Bot
+With D4J installed, you can start writing your bot! Here's an example of a dead-simple "ping-pong" bot which simply
+responds "Pong!" any time someone sends "!ping".
+
+```java
+DiscordClient.create("TOKEN")
+    .withGateway(client ->
+        client.on(MessageCreateEvent.class, event -> {
+          Message message = event.getMessage();
+
+          if (message.getContent().equalsIgnoreCase("!ping")) {
+            return message.getChannel()
+                .flatMap(channel -> channel.createMessage("Pong!"));
+          }
+
+          return Mono.empty();
+        }))
+    .block();
+```
+
+This basic example is easily extended to do all kinds of commands!
+
+See the [Basic Bot Tutorial](basic-bot-tutorial) for an in-depth explanation of this example.

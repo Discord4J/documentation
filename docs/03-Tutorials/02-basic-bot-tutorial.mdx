@@ -1,0 +1,239 @@
+---
+id: basic-bot-tutorial
+title: Basic Bot Tutorial
+sidebar_label: Basic Bot Tutorial
+slug: /basic-bot-tutorial
+---
+
+Making your first bot is very simple. This tutorial will walk you through how to make a basic bot that responds to a
+ping command and listens to some other events.
+
+:::note
+This tutorial assumes a basic familiarity with reactive programming and Reactor. Refer to
+[Reactive (Reactor) Tutorial](reactive-reactor-tutorial) for information on that topic.
+:::
+
+## What is a bot?
+But first, it will be helpful to understand roughly how Discord bots work.
+
+A "bot" is simply a program running on a computer that can interact with Discord. Discord4J provides a way to do those
+interactions in Java. We take care of the low-level details like maintaining a websocket connection and making HTTP
+requests to Discord's web API.
+
+When "logged in," a bot has an active websocket connection with Discord, which will send events to the bot. For example,
+when a message gets sent in a channel the bot has access to, Discord will notify the bot by sending an event with all
+of the relevant information about the message. The bot can interact with Discord primarily by making HTTP requests. For
+example, that is how the bot can send a message.
+
+Using just those two mechanisms (receiving events from Discord via a websocket, and interacting with Discord via HTTP),
+you can create complex programs that do all sorts of things in Discord. In this tutorial, you will learn how to create
+a very simple, but extensible, bot which will send the message "Pong!" any time someone sends "!ping".
+
+## Download / Install
+You first need to set up a project with Discord4J as a dependency. Refer to the [Quickstart](quickstart) page for
+details on how to do that with Maven or Gradle. If you're unfamiliar with those tools, refer to the documentation for
+your specific IDE.
+
+### IntelliJ
+
+- [IntelliJ / Gradle](https://www.jetbrains.com/help/idea/getting-started-with-gradle.html)
+- [IntelliJ / Maven](https://www.jetbrains.com/help/idea/maven-support.html)
+
+### Eclipse
+
+- [Eclipse / Gradle](http://www.vogella.com/tutorials/EclipseGradle/article.html)
+- [Eclipse / Maven](http://www.vogella.com/tutorials/EclipseMaven/article.html)
+
+
+## Constructing the client
+
+As mentioned previously, Discord4J provides higher-level APIs for interacting with Discord. The "entry point" for
+any kind of interaction with Discord is the `DiscordClient`. So, the first thing we need to do in our program is
+construct one. The easiest way to do that is simply using the `create` method. 
+
+:::note
+More advanced configuration of the client can be done with `DiscordClientBuilder`. The default configuration is fine
+for the purposes of this tutorial.
+:::
+
+```java
+import discord4j.core.DiscordClient;
+
+public class MyBot {
+
+  public static void main(String[] args) {
+    DiscordClient client = DiscordClient.create("TOKEN");
+  }
+}
+```
+
+Replace `TOKEN` with your bot's authentication token. This is like a username and password that a normal user
+would use to authenticate with Discord. It can be found in the "Bot" settings page of the developer portal.
+
+## Logging In
+A `DiscordClient` has an important caveat: it presents all of the operations a bot can do _while not logged in_.
+Remember, when a bot is "logged in," it has an active connection to Discord that allows it to receive real-time
+information. While there are many legitimate use cases for _just_ having a non-connected `DiscordClient`, most bots
+will instead require a `GatewayDiscordClient`.
+
+To obtain a `GatewayDiscordClient`, we will use the `withGateway` method of `DiscordClient`. This method allows us to
+say the bot should do when it logs in. We can use the method like so:
+
+```java
+Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> Mono.empty());
+
+login.block();
+```
+
+We can see that `withGateway` returns a `Mono<Void>` which we have named `login`. Upon subscribing to this Mono,
+Discord4J will establish a connection with Discord and perform the action specified by the argument to `withGateway`
+(i.e., it will invoke the function we passed to `withGateway`). In this case, we immediately return `Mono.empty()`,
+so that action is essentially "do nothing." You can confirm this by running the following updated program and observing
+that the bot comes online in Discord, and the program runs indefinitely.
+
+```java
+import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
+import reactor.core.publisher.Mono;
+
+public class MyBot {
+
+  public static void main(String[] args) {
+    DiscordClient client = DiscordClient.create("TOKEN");
+
+    Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> Mono.empty());
+
+    login.block();
+  }
+}
+
+```
+
+:::note
+Because most bots require a `GatewayDiscordClient` over a `DiscordClient`, you will often see the former referred to as
+just "client."
+:::
+
+## Responding to events
+
+A bot doing nothing but being online is pretty boring, so let's change that. Recall that Discord sends real-time
+information to connected clients via events. To listen to these events, we can use the `on` method of
+`GatewayDiscordClient`.
+
+This method has several overloads, but the most useful (and safest, refer to the javadocs for more info) is the one
+which takes a `Function<E, Publisher<T>>` for the second parameter. That function is invoked every time the specified
+event is received from Discord. The Publisher that it returns determines how the event is handled.
+
+Let's look at some concrete examples.
+
+### ReadyEvent
+First, let's listen to `ReadyEvent`. Quoting from the javadoc, this event is "dispatched when an initial connection to
+the Discord gateway has been established." We can rewrite our `withGateway` invocation to instead listen to this event
+and print some information from it.
+
+```java
+Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
+    gateway.on(ReadyEvent.class, event ->
+        Mono.fromRunnable(() -> {
+          final User self = event.getSelf();
+          System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
+        })));
+```
+
+With this code, every occurrence of `ReadyEvent` is handled by printing the username and discriminator of the "self
+user" which is the user associated with the bot account.
+
+:::note
+`fromRunnable` is used because the handler isn't reactive. As we'll see later, this usually isn't the case.
+:::
+
+When you run the program now, you should see the printed `"Logged in as ..."` line once the bot logs in.  In English,
+this new code essentially says "when logged in, listen to the ready event, and when it gets dispatched, print 'logged
+in as ....'"
+
+### MessageCreateEvent
+Next we'll see how to create our `!ping` command. Remember, we want the bot to respond to "!ping" with "pong!".
+
+The setup for listening to the event is exactly the same as with `ReadyEvent`. The only difference is the event we want
+to listen to. In this case that's `MessageCreateEvent`. Again quoting from the javadoc, this event is "dispatched when a
+message is sent in a message channel."
+
+```java
+Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
+    gateway.on(MessageCreateEvent.class, event -> {
+      // ... todo ...
+    }));
+```
+
+We need to fill in the "todo" with code that checks if the message we received is "!ping" and then responds with "pong!"
+if it is. This is fairly straightforward. The main thing here is just knowing which methods will give you access to the
+information you want. Like any library, this familiarity comes with experience.
+
+:::tip
+A pretty good strategy for exploring a new library is to just type `someVariable.` and seeing what suggestions your IDE
+has. For example, without any prior knowledge, you could find that you can get the received message in the event with
+`event.getMessage()` and the content of that message with `event.getMessage().getContent()`.
+:::
+
+The final code with "todo" filled in looks like this.
+```java
+Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
+    gateway.on(MessageCreateEvent.class, event -> {
+      Message message = event.getMessage();
+      
+      if (message.getContent().equalsIgnoreCase("!ping")) {
+          return message.getChannel()
+              .flatMap(channel -> channel.createMessage("pong!"));
+      }
+
+      return Mono.empty();
+    }));
+```
+We check if the message content equals (ignoring case) "!ping", and if it does, we handle the event by creating a
+message in the same channel with the content "pong!". Otherwise, we handle the event by doing nothing (returning
+`Mono.empty()`).
+
+At this point, you can probably see how this could be extended to support many more commands. Try adding another one!
+
+And that's it! If you run the program and send "!ping" in a channel the bot can see, it will dutifully respond "pong!".
+
+### Multiple Events
+
+You might have noticed that the `MessageCreateEvent` example overwrote the `ReadyEvent` one. But what if we want to do
+both? Our bot should both print "Logged in as..." on start up and respond to "!ping" with "pong!". We can easily do
+this with a couple of small modifications and the `and` method.
+
+```java
+Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) -> {
+  // ReadyEvent example
+  Mono<Void> printOnLogin = gateway.on(ReadyEvent.class, event ->
+      Mono.fromRunnable(() -> {
+        final User self = event.getSelf();
+        System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
+      }))
+      .then();
+
+  // MessageCreateEvent example
+  Mono<Void> handlePingCommand = gateway.on(MessageCreateEvent.class, event -> {
+    Message message = event.getMessage();
+
+    if (message.getContent().equalsIgnoreCase("!ping")) {
+      return message.getChannel()
+          .flatMap(channel -> channel.createMessage("pong!"));
+    }
+
+    return Mono.empty();
+  }).then();
+
+  // combine them!
+  return printOnLogin.and(handlePingCommand);
+});
+```
+
+The first change you might notice is the addition of `then()` to both handlers. We didn't discuss is previously, but
+`gateway.on()` returns a `Flux<T>` where `T` is the return type of the event handler function. This allows you to
+continue operating on the results of the handler. In this case, we don't need to do that, so we can simply ignore
+any results with `then()`.
+
+Now that both of the handlers are `Mono<Void>`, we can simply combine them with `and`. The code can be fluently read as
+"when logged in, print on login _and_ handle the ping command."
