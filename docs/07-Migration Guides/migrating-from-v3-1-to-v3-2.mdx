@@ -1,0 +1,169 @@
+---
+id: migrating-from-v3-1-to-v3-2
+title: Migrating from v3.1 to v3.2
+sidebar_label: Migrating from v3.1 to v3.2
+slug: /migrating-from-v3-1-to-v3-2
+---
+
+# Before you start
+
+NOTE: This document is work in progress
+
+If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
+
+# Updating dependencies
+
+Discord4J v3.2 depends on Reactor 2020 release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.4.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 1.0.x). It maintains the JDK 8 baseline and includes other dependency upgrades like:
+
+- discord-json 1.6 (from 1.5)
+- jackson-databind 2.12 (from 2.11)
+- caffeine 2.8 (new dependency)
+
+## Gradle
+
+```groovy
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.discord4j:discord4j-core:3.2.0'
+}
+```
+
+## Maven
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.discord4j</groupId>
+        <artifactId>discord4j-core</artifactId>
+        <version>3.2.0</version>
+    </dependency>
+</dependencies>
+```
+
+# Discord4J features
+
+## Connecting to Discord Gateway
+
+### Gateway Intents
+
+The intent system is now mandatory in the Gateway version used with v3.2. To retain the previous behavior, use `setEnabledIntents(IntentSet.all())` when building a Gateway-capable client. For more information about this feature check [official docs](https://discord.com/developers/docs/topics/gateway#gateway-intents).
+
+```java
+GatewayDiscordClient client = DiscordClient.create(System.getenv("token"))
+        .gateway()
+	      .setEnabledIntents(IntentSet.all())
+        .login()
+        .block();
+```
+
+Otherwise the default will be `IntentSet.nonPrivileged()`. Discord might be changing the set of non-privileged intents in the future, particularly message create [becoming privileged in 2022](https://support-dev.discord.com/hc/en-us/articles/4404772028055).
+
+If you get an error such as `WebSocket closed: 4014 Disallowed intent(s)`, make sure you're allowed to use the intents you enabled, this can be done in your developer portal bot page, look for **Privileged Gateway Intents**.
+
+### New entity cache API
+
+One of the most notable change is the way our `Store` abstraction works for entity caching. If you use a custom `StoreService`, for quick migration you need to adapt it in this way:
+
+```java
+GatewayDiscordClient client = DiscordClient.create(System.getenv("token"))
+        .gateway()
+        .setStore(Store.fromLayout(LegacyStoreLayout.of(myStoreService)))
+        .login()
+        .block();
+```
+
+Where `myStoreService` is what you used previously, for instance:
+
+```java
+StoreService myStoreService = MappingStoreService.create()
+    .setMapping(new NoOpStoreService(), MessageData.class)
+    .setFallback(new JdkStoreService());
+```
+
+### Customizing a `StoreLayout`
+
+The entity cache from v3.1 set a structure that's too rigid for some implementations, so a new interface `StoreLayout` was created to abstract the read/write process that bots needs to handle when connecting to the Discord Gateway to maintain a cache. v3.2 now defaults to `Store.fromLayout(LocalStoreLayout.create())` as the new in-memory entity cache.
+
+A `LocalStoreLayout` configures a set of defaults as well through `StorageConfig`:
+
+- Since messages have a larger storage footprint, a [Caffeine](https://github.com/ben-manes/caffeine) cache `StorageBackend` is set to 1000 of the most recent messages
+- Set to remove all content under stale cache conditions like a non-resumable reconnect or logout
+
+These options can be configured through a builder using: `LocalStoreLayout.create(StorageConfig.builder().build())`
+
+For an example implementation beyond what's built-in, check this project from Discord4J contributor @napstr: https://github.com/CapybaraLabs/d4j-postgres-store
+
+### New bot presence API
+
+After [#874](https://github.com/Discord4J/Discord4J/pull/874), you have to update how bot presence is set when connecting and updated:
+
+- Use `ClientPresence` instead of `Presence`
+- Use `ClientActivity` instead of `Activity`
+- Prefer calling `setInitialPresence` over `setInitialStatus`
+- This also affects methods like `GatewayDiscordClient::updatePresence`
+
+```diff
+DiscordClient.create(System.getenv("token"))
+        .gateway()
+-       .setInitialPresence(s -> Presence.invisible())
++       .setInitialPresence(s -> ClientPresence.invisible())
+        .withGateway(client -> client.on(ReadyEvent.class)
+                .doOnNext(ready -> log.info("Logged in as {}", ready.getSelf().getUsername()))
+                .then())
+        .block();
+```
+
+## Making requests to Discord
+
+### New request spec API
+
+A large effort was introduced in [#927](https://github.com/Discord4J/Discord4J/pull/927) that provides different patterns of building and executing API requests to Discord. This addresses some issues of the `Consumer`-based specs when used for templating, and allows more fluent calls for convenience.
+
+Migrating from your `Consumer` instances should be direct, but if you directly imported them, you might need to update the package, as it was moved to `discord4j.core.spec.legacy` package and all `XxSpec` classes were deprecated and renamed to `LegacyXxSpec`.
+
+NOTE: We plan on removing this now legacy API in the future, so let us know if the current alternatives are not a good fit for your use case.
+
+#### Fluent Mono request
+
+An API request without parameters is a `Mono` that can be subscribed or composed to perform the request.
+
+```java
+member.ban().withReason("ban").block();
+```
+
+#### Spec with copy/withX methods
+
+An immutable `Spec` that can be safely shared and used for templating.
+
+```java
+member.ban(BanQuerySpec.create().withReason("ban")).block();
+```
+
+#### Builder
+
+A more traditional builder pattern approach.
+
+```java
+member.ban(BanQuerySpec.builder().reason("ban").build()).block();
+```
+
+## Advanced features
+
+### Directly querying a store
+
+The recommended way is using `EntityRetrievalStrategy.STORE` for methods that support it. However if it's not available for your use case and used `StateView` before, you now have to migrate to querying a `Store` directly, available from `GatewayResources`.
+
+This abstraction is now focused on query objects, named `ReadActions`. A quick example to get the cached user count:
+
+```java
+// gateway is a GatewayDiscordClient instance
+Store store = gateway.getGatewayResources().getStore();
+long userCount = Mono.from(store.execute(ReadActions.countUsers())).block();
+```
+
+# Summary of API changes
+
+For now, please check our GitHub issue [#748](https://github.com/Discord4J/Discord4J/issues/748) for a full list of API and behavior changes.
