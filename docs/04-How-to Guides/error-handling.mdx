@@ -128,17 +128,13 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
 
 Applying `onErrorContinue` on a `Flux` will change the default behavior of treating errors as terminal events to discarding erroneous elements and keeping the same sequence active.
 
-We do not recommend the usage of this operator for error handling purposes, we highly recommend replacing instances of `onErrorContinue` with this general pattern:
+We do not recommend the usage of this operator for error handling purposes. Instead, try this "resuming to empty" pattern, preventing the error from continuing downstream:
 
 ```java
 ...flatMap(source -> reactiveOperationThatMightError()
         .doOnError(error -> log.info("Error encountered while processing {}", source, error))
         .onErrorResume(error -> Mono.empty()))
 ```
-
-If an error occurs, _supporting operators_ will look for the continue strategy flag before reaching other operators.
-
-Around `Mono` sequences, **we generally recommend sticking with resuming if you already use it**, unless you want a catch-all behavior that can override other `onError*` calls.
 
 #### `onErrorStop`
 
