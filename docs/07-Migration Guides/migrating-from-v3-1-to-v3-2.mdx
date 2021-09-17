@@ -148,18 +148,23 @@ This feature is under development from Discord therefore we have marked it as **
             - ButtonInteractionEvent
             - SelectMenuInteractionEvent
 
-#### Type renames
+#### Renamed interaction types
+
+The following versions are affected and need to migrate to these types when upgrading:
+
+- v3.1.7
+- v3.2.0-RC3
 
 | Previous | New |
 | ----------- | ----------- |
 | SlashCommandEvent | ChatInputInteractionEvent |
+| ComponentInteractEvent | ComponentInteractionEvent |
 | ButtonInteractEvent | ButtonInteractionEvent |
 | SelectMenuInteractEvent | SelectMenuInteractionEvent |
 
 #### Webhook execution
 
 If you used `WebhookMultipartRequest` for your slash command application in v3.1 you now have to migrate to `MultipartRequest<WebhookExecuteRequest>`.
-
 
 ## Advanced features
 
