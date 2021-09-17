@@ -17,7 +17,7 @@ A mediator for resources essential to operate on `DiscordClient`, like the `Rest
 
 ### GatewayDiscordClient
 
-Discord Gateway is the websocket connection receiving real-time updates. In v3.1 we call `GatewayDiscordClient` to the manager of all resources and state regarding all participating shards. Connections are maintained by it and is capable of giving access to cached entities from updates. Can be obtained by calling `getClient()` from most objects.
+Discord Gateway is the websocket connection receiving real-time updates. Starting from v3.1 we call `GatewayDiscordClient` to the manager of all resources and state regarding a shard group. Connections are maintained by it and is capable of giving access to cached entities from updates. Can be obtained by calling `getClient()` from most objects.
 
 ### GatewayBootstrap
 
@@ -25,7 +25,7 @@ A builder to create a `GatewayDiscordClient`. The place where resources and many
 
 ### GatewayClient
 
-The same component as in v3.0, it keeps all state regarding a single shard lifecycle, providing automatic reconnections and forwarding updates to the parent `GatewayDiscordClient`.
+Keeps all state regarding a **single** shard lifecycle, providing automatic reconnections and forwarding updates to the parent `GatewayDiscordClient`.
 
 ### GatewayResources
 
@@ -39,13 +39,13 @@ The set of configuration passed to a `GatewayClient` in order to be created.
 
 A manager in charge of relaying lifecycle events for sharding. It is used to notify clients that shards are identifying, connecting or disconnecting to allow for distributed application scenarios where the notification may be relayed across boundaries.
 
-### StateHolder
+### Store
 
-The same component as in v3.0, it stores all entity updates from the Gateway. In v3.1 though, it will receive updates from all joining shards.
+Starting from v3.2, a Store is the central component for all entity caching from the real-time Gateway, it receives updates from the connected shard group.
 
 ### EventDispatcher
 
-The same component as in v3.0, it publishes Gateway events to the user. In v3.1 the events are coming from all shards, so a single instance is enough for a `GatewayDiscordClient`.
+Publishes Gateway events to your bot application. Since v3.1 the events are coming from all shards in a shard group, so a single instance is enough for a `GatewayDiscordClient`.
 
 ### ReactorResources
 
@@ -55,6 +55,6 @@ Encapsulates Reactor Netty HttpClient and Scheduler for blocking and timed tasks
 
 Jackson ObjectMapper configured specifically for Discord4J, can be customized.
 
-### RouterFactory
+### RouterFactory and Router
 
 Factory to create a `Router` which performs REST API requests. Can be customized to coordinate multiple instances.

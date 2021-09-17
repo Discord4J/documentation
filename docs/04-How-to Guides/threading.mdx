@@ -5,13 +5,15 @@ sidebar_label: Threading
 slug: /threading
 ---
 
-# Reactor and threading
+## Reactor and threading
 
-⚠️ _This is an advanced topic and expects you have read the **Threading and Schedulers** section of the Reactor reference. [Check it out](https://projectreactor.io/docs/core/release/reference/#schedulers) to familiarize yourself with its API and usage._
+:::note
+This is an advanced topic and expects you have read the **Threading and Schedulers** section of the Reactor reference. [Check it out](https://projectreactor.io/docs/core/release/reference/#schedulers) to familiarize yourself with its API and usage.
+:::
 
 Reactor is a **concurrency agnostic runtime**, there is no set thread affinity for each operator, leaving users in control on the thread in which operations happen. The framework provides many `Scheduler` implementations and helper methods that materialize that control and are used by Discord4J throughout its modules.
 
-# Threading model
+## Threading model
 
 Discord4J sets reasonable defaults on the threading aspect, to cover the most possible use cases without compromising performance. First, since our network runtime is the [Reactor Netty](https://github.com/reactor/reactor-netty) project, every HTTP (API and websocket) and UDP interaction occurs on their default scheduling approach which is providing an **event loop** using an amount of threads given by the available processors, with a minimum of 4.
 
@@ -21,11 +23,11 @@ Every HTTP API response is given back to you through the **Bounded Elastic Sched
 
 Some operations create exclusive Schedulers for serializing calls like emitting permits for rate-limited operations like the GlobalRateLimiter, Gateway IDENTIFY limiter and the per-session outbound limiter.
 
-# Customization
+## Customization
 
 Since Reactor gives the control to its users regarding threading, it is our goal to extend that flexibility to you as well. While you're still under control using operators such as [`publishOn`](https://projectreactor.io/docs/core/release/reference/#_publishon) and [`subscribeOn`](https://projectreactor.io/docs/core/release/reference/#_subscribeon) you can also override some defaults we set above.
 
-## ReactorResources
+### ReactorResources
 
 A new class dedicated to group application-wide resources used by Discord4J was created starting from v3.1.0. [ReactorResources](https://www.javadoc.io/doc/com.discord4j/discord4j-common/latest/discord4j/common/ReactorResources.html) is the place to customize a set of `Scheduler` instances and other Reactor-related resources, including the schedulers used by HTTP/Websocket and UDP clients.
 
@@ -42,7 +44,7 @@ DiscordClient discordClient = DiscordClientBuilder.create("TOKEN")
     .build();
 ```
 
-### Replacing Schedulers
+#### Replacing Schedulers
 
 ```java
 ReactorResources reactorResources = ReactorResources.builder()
@@ -51,7 +53,7 @@ ReactorResources reactorResources = ReactorResources.builder()
     .build();
 ```
 
-#### `timerTaskScheduler`
+##### `timerTaskScheduler`
 
 Dedicated to all tasks that involve delays, or other time-sensitive operations. This means **blocking** is forbidden under these schedulers. Defaults to a parallel scheduler named `d4j-parallel-N` and will throw an exception if running blocking code on it.
 
@@ -63,14 +65,14 @@ Dedicated to all tasks that involve delays, or other time-sensitive operations. 
 - Scheduling Voice Gateway periodic heartbeat
 - Delaying connection attempts for Gateway and Voice Gateway
 
-#### `blockingTaskScheduler`
+##### `blockingTaskScheduler`
 
 Dedicated to all tasks where **blocking** is possible. Defaults to Reactor global `boundedElastic` scheduler.
 
 - Scheduling early event listeners registered through `GatewayBootstrap::withEventDispatcher`
 - Publishing responses from the REST API operations
 
-### Specific resources for Gateway and Voice
+#### Specific resources for Gateway and Voice
 
 A `ReactorResources` instance will be used for REST API operations, and reused for Gateway and Voice operations, **unless** overridden by the user.
 
@@ -101,11 +103,11 @@ A `VoiceGatewayResources` requires extra parameters due to all concurrent tasks 
 - Scheduling Voice send task (defaults to `timerTaskScheduler` if not replaced)
 - Scheduling Voice receive task (defaults to `timerTaskScheduler` if not replaced)
 
-## EventDispatcher
+### EventDispatcher
 
 The `EventDispatcher` is a key element in the Discord4J Core architecture. Since v3.1.0 a wide range of customization is possible on this component, in particular: the backing Processor, its back-pressure (flow control) strategy, and the Scheduler used for publishing events.
 
-### Replacing thread model
+#### Replacing thread model
 
 Acquire a builder using `EventDispatcher::builder` and customize its scheduler using `eventScheduler`:
 

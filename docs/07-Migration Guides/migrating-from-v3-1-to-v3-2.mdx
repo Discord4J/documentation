@@ -7,9 +7,9 @@ slug: /migrating-from-v3-1-to-v3-2
 
 ## Before you start
 
-NOTE: This document is a work in progress
-
-If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
+:::note
+This document is a work in progress. If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
+:::
 
 ## Updating dependencies
 
@@ -52,7 +52,7 @@ The intent system is now mandatory in the Gateway version used with v3.2. To ret
 ```java
 GatewayDiscordClient client = DiscordClient.create(System.getenv("token"))
         .gateway()
-	      .setEnabledIntents(IntentSet.all())
+        .setEnabledIntents(IntentSet.all())
         .login()
         .block();
 ```
@@ -81,19 +81,6 @@ StoreService myStoreService = MappingStoreService.create()
     .setFallback(new JdkStoreService());
 ```
 
-### Customizing a `StoreLayout`
-
-The entity cache from v3.1 set a structure that's too rigid for some implementations, so a new interface `StoreLayout` was created to abstract the read/write process that bots need to handle when connecting to the Discord Gateway to maintain a cache. v3.2 now defaults to `Store.fromLayout(LocalStoreLayout.create())` as the new in-memory entity cache.
-
-A `LocalStoreLayout` configures a set of defaults as well through `StorageConfig`:
-
-- Since messages have a larger storage footprint, a [Caffeine](https://github.com/ben-manes/caffeine) cache `StorageBackend` set to retain 1000 most recent messages
-- Set to remove all content under stale cache conditions like a non-resumable reconnect or logout
-
-These options can be configured through a builder using: `LocalStoreLayout.create(StorageConfig.builder().build())`
-
-For an example implementation beyond what's built-in, check this project from Discord4J contributor @napstr: https://github.com/CapybaraLabs/d4j-postgres-store
-
 ### New bot presence API
 
 After [#874](https://github.com/Discord4J/Discord4J/pull/874), you have to update how bot presence is set when connecting and updated:
@@ -119,7 +106,9 @@ A large effort was introduced in [#927](https://github.com/Discord4J/Discord4J/p
 
 Migrating from your `Consumer` instances should be direct, but if you directly imported them, you might need to update the package, as it was moved to `discord4j.core.spec.legacy` package and all `XxSpec` classes were deprecated and renamed to `LegacyXxSpec`.
 
-NOTE: We plan on removing this now legacy API in the future, so let us know if the current alternatives are not a good fit for your use case.
+:::note
+We plan on removing this now legacy API in the future, so let us know if the current alternatives are not a good fit for your use case.
+:::
 
 #### Fluent Mono request
 
@@ -145,6 +134,33 @@ A more traditional builder pattern approach.
 member.ban(BanQuerySpec.builder().reason("ban").build()).block();
 ```
 
+### Interactions
+
+This feature is under development from Discord therefore we have marked it as **Experimental**, meaning breaking changes can happen between minor versions (in D4J that is from x.y.z to x.y.z+1). A new hierarchy was introduced after the inclusion of context menus in [#1001](https://github.com/Discord4J/Discord4J/pull/1001)
+
+- Event
+    - InteractionCreateEvent
+        - ApplicationCommandInteractionEvent
+            - ChatInputInteractionEvent
+            - MessageInteractionEvent
+            - UserInteractionEvent
+        - ComponentInteractionEvent
+            - ButtonInteractionEvent
+            - SelectMenuInteractionEvent
+
+#### Type renames
+
+| Previous | New |
+| ----------- | ----------- |
+| SlashCommandEvent | ChatInputInteractionEvent |
+| ButtonInteractEvent | ButtonInteractionEvent |
+| SelectMenuInteractEvent | SelectMenuInteractionEvent |
+
+#### Webhook execution
+
+If you used `WebhookMultipartRequest` for your slash command application in v3.1 you now have to migrate to `MultipartRequest<WebhookExecuteRequest>`.
+
+
 ## Advanced features
 
 ### Directly querying a store
@@ -159,6 +175,19 @@ Store store = client.getGatewayResources().getStore();
 long userCount = Mono.from(store.execute(ReadActions.countUsers())).block();
 ```
 
-## Summary of API changes
+### Customizing a `StoreLayout`
 
-For now, please check our GitHub issue [#748](https://github.com/Discord4J/Discord4J/issues/748) for a full list of API and behavior changes.
+The entity cache from v3.1 set a structure that's too rigid for some implementations, so a new interface `StoreLayout` was created to abstract the read/write process that bots needs to handle when connecting to the Discord Gateway to maintain a cache. v3.2 now defaults to `Store.fromLayout(LocalStoreLayout.create())` as the new in-memory entity cache.
+
+A `LocalStoreLayout` configures a set of defaults as well through `StorageConfig`:
+
+- Since messages have a larger storage footprint, a [Caffeine](https://github.com/ben-manes/caffeine) cache `StorageBackend` is set to 1000 of the most recent messages
+- Set to remove all content under stale cache conditions like a non-resumable reconnect or logout
+
+These options can be configured through a builder using: `LocalStoreLayout.create(StorageConfig.builder().build())`
+
+For an example implementation beyond what's built-in, check this project from Discord4J contributor @napstr: https://github.com/CapybaraLabs/d4j-postgres-store
+
+### Other features
+
+Check more details about the API and behavior changes in [What's new in v3.2](whats-new-in-v3-2).

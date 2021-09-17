@@ -7,12 +7,58 @@ slug: /specs
 
 ## Introduction
 
-Specs, short for Specification(s), are a unique design philosophy adopted by Discord4J to handle requests that contain multiple _optional_ properties. They are very similar to the common [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern), but with two very important differentiating characteristics:
+Specs, short for Specification(s), are the way Discord4J encapsulates API request parameter building from our core module. They can handle requests that contain multiple _optional_ properties.
+
+There are multiple ways of interacting with them and building them, starting from v3.2.
+
+## New immutable Specs (v3.2)
+
+### Fluent Mono request
+
+An API request without parameters is a `Mono` that can be subscribed or composed to perform the request.
+
+```java
+channel.createMessage("Hey")
+    .withComponents(ActionRow.of(Button.success("hey", "Click me!")))
+    .subscribe();
+```
+
+Remember that nothing happens until you subscribe! This can be used to your advantage by reusing the `Mono` pipeline you build after each `withX`.
+
+### Spec with copy methods
+
+An immutable `Spec` that can be shared across components and used for templating. Each `with` call copies the previous instance to maintain immutability and ensure thread-safety.
+
+```java
+MessageCreateSpec spec = MessageCreateSpec.create()
+    .withContent("Hey")
+    .withComponents(ActionRow.of(Button.success("hey", "Click me!")));
+
+channel.createMessage(spec).subscribe();
+```
+
+### Builder pattern
+
+A more traditional builder pattern approach. Make sure you call `builder` on the right spec for an instance you can configure to your liking.
+
+
+```java
+MessageCreateSpec spec = MessageCreateSpec.builder()
+        .content("Hey")
+        .addComponent(ActionRow.of(Button.success("hey", "Click me!")))
+        .build();
+
+channel.createMessage(spec).subscribe();
+```
+
+## Consumer-based Specs
+
+Prior to Discord4J v3.2 this was the only alternative to building requests, it follows two principles:
 
 1. The end-user does **not** construct the builder.
 2. The end-user does **not** construct the finalized object.
 
-These two characteristics provide Discord4J with tremendous flexibility when it comes to constructing requests without breaking the API at a future date. Different requests to Discord may require different procedures and Specs allows Discord4J to "construct" these requests in an implementation-dependent manner while still providing the end-user control in "building" the request parameters using a singular syntax that is consistent across the API.
+These two characteristics provide Discord4J with a flexible approach regarding constructing requests, without breaking the API at a future date.
 
 ### Example
 
@@ -37,7 +83,11 @@ Mono<Message> message = messageChannel.createMessage(messageSpec -> {
 
 ### Templates
 
-It is a very common pattern, especially when dealing with embedded messages, to provide a "template" that can later be edited to fit a specific use-case. Using `Consumer#andThen` allows this pattern to be implemented easily:
+:::note
+For templates, it is more convenient to use the new immutable specs.
+:::
+
+Using `Consumer#andThen` allows this pattern to be implemented:
 
 ```java
 Consumer<EmbedCreateSpec> template = spec -> {
@@ -51,4 +101,4 @@ Mono<Message> message = messageChannel.createMessage(messageSpec ->
 );
 ```
 
-This pattern additionally helps protect the end-user from accidentally sharing specs across multiple invocations, as the state is never "reset" and mutating `Spec` instances is **not** thread-safe.
+This pattern additionally helps protect the end-user from accidentally sharing specs across multiple invocations, as the state is never "reset" and mutating these legacy `Spec` instances is **not** thread-safe.

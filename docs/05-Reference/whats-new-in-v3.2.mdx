@@ -1,0 +1,167 @@
+---
+id: whats-new-in-v3-2
+title: What's new in v3.2
+sidebar_label: What's new in v3.2
+slug: /whats-new-in-v3-2
+---
+
+## Maintenance mode for v3.1
+
+After v3.2.0 releases, only bugfixes will be accepted in the 3.1.x branch.
+
+## Features
+
+### New entity cache abstraction: `Store`
+
+While developing v3.1.x some limitations were encountered if trying to implement a custom entity cache pursuing
+efficiency, as a given abstraction to organize data was fixed on implementations ("9-Store layout"), that forced
+cache operations around a generic find/save set of operations, without taking into consideration the relational aspect
+some entities have and could be leveraged for improved performance.
+
+To address this and other problems, an abstraction named `Store` is introduced in [#788](https://github.com/Discord4J/Discord4J/pull/788)
+around a command-oriented pattern by requiring a single method: `execute(StoreAction)`. This method is responsible for
+receiving both Gateway updates and user-facing queries, giving implementations no restrictions, but tools that help with the process.
+
+Some of the most notable components added:
+
+- `StoreLayout`: the minimal set of methods that are required to support a Discord cache: Gateway updates, and data-access queries
+- `ActionMapper`: a registry for `StoreAction` instances passed to the `Store`
+- `ReadActions`: all queries placed in a convenient class, to build actions
+- `DispatchStoreLayer`: introduce caching capabilities to users operating exclusively with the `gateway` module
+
+Regarding project organization, `Store` now lives in the `discord4j-common` module, dropping the dependency on `stores-api`.
+This also means structures like `StateHolder` and `StateView` are no longer present. Check the [migration guide](migrating-from-v3-1-to-v3-2#directly-querying-a-store) for details.
+
+### New immutable spec API
+
+After receiving feedback regarding `Consumer`-based request builders, a new set of APIs were introduced in [#927](https://github.com/Discord4J/Discord4J/pull/927),
+aiming to help with API request building. Multiple patterns are available so please check the [Specs](specs) page for more information.
+
+### Preparing for threads
+
+In order to easily migrate to a new channel hierarchy supporting threads, some changes were applied to v3.2 [deprecating](#deprecations-for-threads-in-3-1)
+methods that won't be available in v3.3 after thread channels are implemented in [#923](https://github.com/Discord4J/Discord4J/pull/923).
+
+## API changes
+
+### Signature changes
+
+- Slash command methods that previously took `WebhookMultipartRequest` now take `MultipartRequest<WebhookExecuteRequest>` and can be built using one of its static factory methods
+- Optional returns from Message.Embed methods (previously returning `null`) [#749](https://github.com/Discord4J/Discord4J/pull/749)
+- GatewayResources::getIntents return type changes from `Possible<IntentSet>` to `IntentSet`
+- RestGuild::modifyMember and GuildService::modifyGuildMember return type changes from `Mono<Void>` to `Mono<MemberData>`
+- Message::getAttachments return type changes from `Set<Attachment>` to `List<Attachment>`
+- DiscordWebClient supports a custom baseUrl [#902](https://github.com/Discord4J/Discord4J/pull/902)
+- ChannelService::editMessage 3rd parameter changes from `MessageEditRequest` to `MultipartRequest<MessageEditRequest>`
+    - If you used this method before, you can wrap the old request using `MultipartRequest.ofRequest(request)`
+
+#### Updates due to new Reactor API
+
+- GatewayClient::close return type changes from `Mono<Void>` to `Mono<CloseStatus>`
+- GatewayClient::sender return type changes from `FluxSink<GatewayPayload<?>>` to `Sinks.Many<GatewayPayload<?>>`
+
+#### Changes around Message mentions [#858](https://github.com/Discord4J/Discord4J/pull/858)
+
+- Message::getUserMentionIds return type changes from `Set<Snowflake>` to `List<Snowflake>`
+- Message::getUserMentions return type changes from `Flux<User>` to `List<User>`
+- Message::getRoleMentionIds return type changes from `Set<Snowflake>` to `List<Snowflake>`
+- Message::getReactions return type changes from `Set<Reaction>` to `List<Reaction>`
+
+#### Changes around UserData direct usage [#898](https://github.com/Discord4J/Discord4J/pull/898)
+
+- PrivateChannel::getRecipients return type changes from `Flux<User>` to `Set<User>`
+- Invite::getInviter return type changes from `Mono<User>` to `Optional<User>`
+- Inviter::getTargetUser return type changes from `Mono<User>` to `Optional<User>`
+
+#### Data type changes from Discord
+
+- Member::getJoinTime return type changes from `Instant` to `Optional<Instant>`
+- MemberUpdateEvent::getJoinTime return type changes from `Instant` to `Optional<Instant>`
+
+#### Audit log changes [#899](https://github.com/Discord4J/Discord4J/pull/899)
+
+- ChangeKey.ROLES_ADD and ChangeKey.ROLES_REMOVE type change from `ChangeKey<Set<Role>>` to `ChangeKey<Set<AuditLogRole>>` to properly reflect the data type returned from Discord. Contains `id` and `name`.
+- OptionKey.DELETE_MEMBER_DAYS and OptionKey.MEMBERS_REMOVED type change from `OptionKey<String>` to `OptionKey<Integer>`
+
+
+### New types
+
+- Store, StoreLayout and others related to the Store rework [#788](https://github.com/Discord4J/Discord4J/pull/788)
+- ClientPresence and ClientActivity to be used when setting the bot's status [#874](https://github.com/Discord4J/Discord4J/pull/874)
+
+### Moved and renamed types
+
+- Due to immutable specs [#927](https://github.com/Discord4J/Discord4J/pull/927), Consumer-based `XXSpec` classes are now located at `discord4j.core.spec.legacy` package and renamed to `LegacyXXSpec`. They are deprecated to encourage usage of the new patterns, and might be removed in a future release
+
+### Removed types
+
+- PrivateChannelCreateEvent
+- StateView
+- InvalidationStrategy
+
+### Deprecations
+
+#### Multiple embeds in a message [#950](https://github.com/Discord4J/Discord4J/pull/950)
+
+- `MessageCreateSpec::setEmbed` and `MessageEditSpec::setEmbed`
+- Use new specs or `addEmbed(Consumer)` or `removeEmbeds()`
+
+#### Prepare new channel hierarchy for threads [#959](https://github.com/Discord4J/Discord4J/pull/959) {#deprecations-for-threads-in-3-1}
+
+- `GuildChannel` methods moving to `TopLevelGuildChannel`
+    - `getPermissionOverwrites`
+    - `getOverwriteForMember`
+    - `getOverwriteForRole`
+    - `getRawPosition`
+    - `getPosition`
+    - `addMemberOverwrite`
+    - `addRoleOverwrite`
+- `GuildMessageChannel` methods moving to `TopLevelGuildMessageChannel`
+    - `getTopic`
+    - `createWebhook`
+    - `getWebhooks`
+- `GuildMessageChannel` should no longer be treated as a subtype of `CategorizableChannel`. These methods are deprecated "for removal"
+    - `getCategoryId`
+    - `getCategory`
+    - `createInvite`
+    - `getInvites`
+
+### Additions
+
+- IntentSet.nonPrivileged() is the new default
+- MemberUpdateEvent::getCurrentRoles returns a `Flux<Role>` [#807](https://github.com/Discord4J/Discord4J/pull/807)
+- New API to get self member [#871](https://github.com/Discord4J/Discord4J/pull/871)
+    - EntityRetriever.getSelfMember(guildId)
+    - RestClient.selfRestMember(guildId)
+    - RestClient.getSelfMember(guildId)
+- Member-based permission calculation [#873](https://github.com/Discord4J/Discord4J/pull/873)
+    - GuildChannel.getEffectivePermissions(Member)
+- Audit log changes [#899](https://github.com/Discord4J/Discord4J/pull/899)
+    - Guild::getAuditLog methods now return `Flux<AuditLogPart>` to provide easier access to all related entities
+
+### Renames
+
+- MemberUpdateEvent::getCurrentRoles renamed to MemberUpdateEvent::getCurrentRoleIds [#807](https://github.com/Discord4J/Discord4J/pull/807)
+
+### Removals
+
+- Guild ::getEmbedChannel / ::getEmbedChannelId (was deprecated in 3.1.x, use getWidget*)
+- RestGuild ::getEmbed / ::modifyEmbed (was deprecated in 3.1.x, use getWidget & modifyWidget)
+- Removals due to new Store API, see [migration notes](migrating-from-v3-1-to-v3-2#new-entity-cache-api)
+    - GatewayResources::getStateView (replaced with ::getStore)
+    - GatewayBootstrap::setStoreService (replaced with ::setStore)
+    - GatewayBootstrap::setInvalidationStrategy (look for `StorageConfig` builder for a replacement)
+- RestGuild::getIntegrations(boolean) and GuildService::getGuildIntegrations(long, boolean) [#803](https://github.com/Discord4J/Discord4J/pull/803)
+- Message::getUserMentions(EntityRetrievalStrategy) (no fetching strategy needed) [#858](https://github.com/Discord4J/Discord4J/pull/858)
+- UserService::getUserDMs (deprecated endpoint) [#890](https://github.com/Discord4J/Discord4J/pull/890)
+- Use provided data over cached one where possible [#898](https://github.com/Discord4J/Discord4J/pull/898)
+    - Invite::getInviter(EntityRetrievalStrategy) (no fetching strategy needed)
+    - Invite::getTargetUser(EntityRetrievalStrategy) (no fetching strategy needed)
+    - PrivateChannel::getRecipients(EntityRetrievalStrategy) (no fetching strategy needed)
+
+## Behavior changes
+
+- As part of v8 and above changes, Intents are mandatory so the new default if you don't set any will be IntentSet.nonPrivileged()
+- Default to MemberRequestFilter.none if missing GUILD_MEMBERS intent
+- RestGuild::getData now includes with_counts = true by default [#826](https://github.com/Discord4J/Discord4J/pull/826)
+

@@ -5,7 +5,9 @@ sidebar_label: Error Handling
 slug: /error-handling
 ---
 
-ℹ️ _For a more detailed source of information, please refer to [this section](https://projectreactor.io/docs/core/release/reference/#error.handling) of the Reactor reference guide._
+:::note
+For a more detailed source of information, please refer to [this section](https://projectreactor.io/docs/core/release/reference/#error.handling) of the Reactor reference guide.
+:::
 
 According to reactive streams specification, errors are terminal signals. This typically means any running sequence will be **terminated** and the error propagated to all operators down the chain.
 
@@ -118,13 +120,21 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
 
 ✔️ This approach is compatible with `EventDispatcher` sources when using the [default event processor](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/EmitterProcessor.html), due to it only relaying events since the time of subscription. As retrying creates a new subscription, the erroring event will be discarded and the sequence will continue from the next event.
 
-### Catch and continue mode, and reverting to stop mode
+### Catch and continue mode
 
 #### `onErrorContinue`
 
 ⚠️ This only works **on supporting operators**: `flatMap`, `map` and `filter`, among others according to their javadocs. This operator goes beyond the Reactive Streams spec and uses the Reactor Context to work, therefore it is prone to issues when combining it with unsupported operators. Only use this operator if you understand the consequences, or you're familiar with how Reactor Context works.
 
 Applying `onErrorContinue` on a `Flux` will change the default behavior of treating errors as terminal events to discarding erroneous elements and keeping the same sequence active.
+
+We do not recommend the usage of this operator for error handling purposes, we highly recommend replacing instances of `onErrorContinue` with this general pattern:
+
+```java
+...flatMap(source -> reactiveOperationThatMightError()
+        .doOnError(error -> log.info("Error encountered while processing {}", source, error))
+        .onErrorResume(error -> Mono.empty()))
+```
 
 If an error occurs, _supporting operators_ will look for the continue strategy flag before reaching other operators.
 
