@@ -5,13 +5,13 @@ sidebar_label: Migrating from v3.1 to v3.2
 slug: /migrating-from-v3-1-to-v3-2
 ---
 
-# Before you start
+## Before you start
 
-NOTE: This document is work in progress
+NOTE: This document is a work in progress
 
 If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
 
-# Updating dependencies
+## Updating dependencies
 
 Discord4J v3.2 depends on Reactor 2020 release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.4.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 1.0.x). It maintains the JDK 8 baseline and includes other dependency upgrades like:
 
@@ -19,7 +19,7 @@ Discord4J v3.2 depends on Reactor 2020 release train ([Reactor Core](https://git
 - jackson-databind 2.12 (from 2.11)
 - caffeine 2.8 (new dependency)
 
-## Gradle
+### Gradle
 
 ```groovy
 repositories {
@@ -31,7 +31,7 @@ dependencies {
 }
 ```
 
-## Maven
+### Maven
 
 ```xml
 <dependencies>
@@ -43,9 +43,7 @@ dependencies {
 </dependencies>
 ```
 
-# Discord4J features
-
-## Connecting to Discord Gateway
+## Discord4J features
 
 ### Gateway Intents
 
@@ -85,11 +83,11 @@ StoreService myStoreService = MappingStoreService.create()
 
 ### Customizing a `StoreLayout`
 
-The entity cache from v3.1 set a structure that's too rigid for some implementations, so a new interface `StoreLayout` was created to abstract the read/write process that bots needs to handle when connecting to the Discord Gateway to maintain a cache. v3.2 now defaults to `Store.fromLayout(LocalStoreLayout.create())` as the new in-memory entity cache.
+The entity cache from v3.1 set a structure that's too rigid for some implementations, so a new interface `StoreLayout` was created to abstract the read/write process that bots need to handle when connecting to the Discord Gateway to maintain a cache. v3.2 now defaults to `Store.fromLayout(LocalStoreLayout.create())` as the new in-memory entity cache.
 
 A `LocalStoreLayout` configures a set of defaults as well through `StorageConfig`:
 
-- Since messages have a larger storage footprint, a [Caffeine](https://github.com/ben-manes/caffeine) cache `StorageBackend` is set to 1000 of the most recent messages
+- Since messages have a larger storage footprint, a [Caffeine](https://github.com/ben-manes/caffeine) cache `StorageBackend` set to retain 1000 most recent messages
 - Set to remove all content under stale cache conditions like a non-resumable reconnect or logout
 
 These options can be configured through a builder using: `LocalStoreLayout.create(StorageConfig.builder().build())`
@@ -105,18 +103,15 @@ After [#874](https://github.com/Discord4J/Discord4J/pull/874), you have to updat
 - Prefer calling `setInitialPresence` over `setInitialStatus`
 - This also affects methods like `GatewayDiscordClient::updatePresence`
 
-```diff
+```java
 DiscordClient.create(System.getenv("token"))
         .gateway()
--       .setInitialPresence(s -> Presence.invisible())
-+       .setInitialPresence(s -> ClientPresence.invisible())
+        .setInitialPresence(s -> ClientPresence.invisible())
         .withGateway(client -> client.on(ReadyEvent.class)
                 .doOnNext(ready -> log.info("Logged in as {}", ready.getSelf().getUsername()))
                 .then())
         .block();
 ```
-
-## Making requests to Discord
 
 ### New request spec API
 
@@ -159,11 +154,11 @@ The recommended way is using `EntityRetrievalStrategy.STORE` for methods that su
 This abstraction is now focused on query objects, named `ReadActions`. A quick example to get the cached user count:
 
 ```java
-// gateway is a GatewayDiscordClient instance
-Store store = gateway.getGatewayResources().getStore();
+// client is a GatewayDiscordClient instance
+Store store = client.getGatewayResources().getStore();
 long userCount = Mono.from(store.execute(ReadActions.countUsers())).block();
 ```
 
-# Summary of API changes
+## Summary of API changes
 
 For now, please check our GitHub issue [#748](https://github.com/Discord4J/Discord4J/issues/748) for a full list of API and behavior changes.
