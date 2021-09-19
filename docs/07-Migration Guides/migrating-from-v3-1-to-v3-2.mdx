@@ -5,6 +5,9 @@ sidebar_label: Migrating from v3.1 to v3.2
 slug: /migrating-from-v3-1-to-v3-2
 ---
 
+This article should help you update your bot from Discord4J v3.1.x to v3.2.0. This new major release is over a year
+in the making and has lots of changes.
+
 ## Before you start
 
 :::note
@@ -104,35 +107,89 @@ DiscordClient.create(System.getenv("token"))
 
 A large effort was introduced in [#927](https://github.com/Discord4J/Discord4J/pull/927) that provides different patterns of building and executing API requests to Discord. This addresses some issues of the `Consumer`-based specs when used for templating, and allows more fluent calls for convenience.
 
-Migrating from your `Consumer` instances should be direct, but if you directly imported them, you might need to update the package, as it was moved to `discord4j.core.spec.legacy` package and all `XxSpec` classes were deprecated and renamed to `LegacyXxSpec`.
-
-:::note
-We plan on removing this now legacy API in the future, so let us know if the current alternatives are not a good fit for your use case.
-:::
-
-#### Fluent Mono request
-
-An API request without parameters is a `Mono` that can be subscribed or composed to perform the request.
-
+Consider the following example of spec usage in 3.1.x:
 ```java
-member.ban().withReason("ban").block();
+channel.createMessage(msg -> {
+  msg.setContent("Hello @everyone");
+  msg.setAllowedMentions(AllowedMentions.suppressEveryone());
+  msg.addEmbed(embed -> {
+    embed.setTitle("Foo");
+    embed.addField("Bar", "Baz", false);
+    embed.setColor(Color.BLUE);
+  });
+})
 ```
 
-#### Spec with copy/withX methods
+The `createMessage` method takes a `Consumer<MessageCreateSpec>`. In other words, the spec is "given to you" by the
+method, and you mutate that spec to put it in the state you want. While it works well, this pattern was often confusing
+to users, most notably because you couldn't ever really "hold" a spec. It was a kind of ephemeral thing that could only
+be given to you in these mutating Consumers.
 
-An immutable `Spec` that can be safely shared and used for templating.
-
-```java
-member.ban(BanQuerySpec.create().withReason("ban")).block();
-```
+In 3.2, we sought to "materialize" specs. Specs are now immutable data carriers that can be built in a few different
+ways. The way you pick is purely up to your preference.
 
 #### Builder
-
-A more traditional builder pattern approach.
-
+The most obvious way to build an object in Java is the builder pattern. This works exactly how you think it would.
 ```java
-member.ban(BanQuerySpec.builder().reason("ban").build()).block();
+channel.createMessage(MessageCreateSpec.builder()
+  .content("Hello @everyone")
+  .allowedMentions(AllowedMentions.suppressEveryone())
+  .addEmbed(EmbedCreateSpec.builder()
+    .title("Foo")
+    .addField("Bar", "Baz", false)
+    .color(Color.BLUE)
+    .build())
+  .build())
 ```
+
+Any spec, `SomeSpec`, has a static method `SomeSpec.builder()` which will return a `SomeSpec.Builder`.
+
+#### Withers
+In addition to a builder, all specs come equipped with "wither" (or `withX`) methods that return a copy of the current
+spec with a modified field. The above example could be equivalently written as...
+```java
+channel.createMessage(MessageCreateSpec.create()
+  .withContent("Hello @everyone")
+  .withAllowedMentions(AllowedMentions.suppressEveryone())
+  .withEmbeds(EmbedCreateSpec.create()
+    .withTitle("Foo")
+    .withFields(EmbedCreateFields.Field.of("Bar", "Baz", false))
+    .withColor(Color.BLUE)))
+```
+
+Similar to `builder()`, specs also have a static `create()` method that returns a minimal, default spec which can be
+modified using the wither methods.
+
+#### Fluent Publishers
+Finally, most methods that accept specs also have a parameter-less (or minimal parameters) overload that instead returns
+a special `Mono` or `Flux`. These publishers have methods corresponding to each property of the spec. This allows for
+fluent calls to these methods.
+```java
+channel.createMessage("Hello @everyone")
+  .withAllowedMentions(AllowedMentions.suppressEveryone())
+  .withEmbeds(EmbedCreateSpec.create()
+    .withTitle("Foo")
+    .withFields(EmbedCreateFields.Field.of("Bar", "Baz", false))
+    .withColor(Color.BLUE)))
+```
+
+For a supported spec, `SomeActionSpec`, there will be a corresponding publisher `SomeAction(Mono/Flux)`. Note that this
+isn't supported for all specs. As you can see above, the parameter to `withEmbeds` isn't included in the surrounding
+fluent chain (and we could have chosen to use a builder there if we wanted).
+
+#### Legacy Specs
+To aide migration, we will continue to support the previous spec behavior in 3.2. The old ("legacy") specs have been
+moved to `discord4j.core.spec.legacy`, and had `Legacy` prepended to their names. For example, 3.1's
+`discord4j.core.spec.MessageCreateSpec` is now `discord4j.core.spec.legacy.LegacyMessageCreateSpec` in 3.2.
+
+This means that any code using specs like `foo(spec -> ...)` will continue to work without issues, but if you directly
+imported a spec class, you will need to update the package, as it was moved to `discord4j.core.spec.legacy` package and
+all `XxSpec` classes were deprecated and renamed to `LegacyXxSpec`.
+
+:::warning
+These legacy specs are deprecated. They exist only to make migration a bit easier, and they _will_ be removed in a
+future version. Please let us know if the current alternatives are not a good fit for your use case.
+:::
 
 ### Interactions
 
