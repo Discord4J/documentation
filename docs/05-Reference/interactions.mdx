@@ -1,0 +1,118 @@
+---
+id: interactions
+title: Interactions
+sidebar_label: Interactions
+slug: /interactions
+---
+
+## Application Commands
+
+:::note
+For information on how to use application commands, see [here](/interactions/application-commands).
+:::
+
+Application commands encompass several types of interactions:
+* A chat input command (formerly "slash command"), which allows users to type a command in the chat box.
+* Message command, which allows right-clicking on a message and using a context menu interaction (ex. "star message").
+* Or User command, which allows right-clicking on a user and using a context menu interaction (ex. "temp mute").
+
+In order for guilds to use application commands your bot has created, it is required that the bot be invited with the `applications.commands` scope in addition to the `bot` scope.
+
+Application commands can be registered globally (accessible to all guilds that your bot is invited to), or per-guild; allowing each guild to have their own unique commands as they see fit.
+
+
+### Chat Input (Slash Commands)
+
+<img src="/img/interactions/chat-command-reply.png" />
+
+#### Options
+Chat input commands can have `options`. These are just like arguments in a method, but for discord commands.
+
+#### Option Types
+Discord provides several built in types for options that define how each of them behave and their data type.
+
+| Name              | Value | Note                                                             |
+|-------------------|-------|------------------------------------------------------------------|
+| SUB_COMMAND       | 1     |                                                                  |
+| SUB_COMMAND_GROUP | 2     | Transparent to the user; a way to organize your commands in code |
+| STRING            | 3     |                                                                  |
+| INTEGER           | 4     | Any integer between -2^53 and 2^53                               |
+| BOOLEAN           | 5     |                                                                  |
+| USER              | 6     |                                                                  |
+| CHANNEL           | 7     | Includes all channel types + categories                          |
+| ROLE              | 8     |                                                                  |
+| MENTIONABLE       | 9     | Includes all users/roles                                         |
+| NUMBER            | 10    | Any floating point number between -2^53 and 2^53                 |
+
+#### Choices
+
+Choices can be defined on the `STRING`, `INTEGER`, and `NUMBER` option types. `choices` are preset values the user can pick when selecting the option that contains them.
+
+:::caution
+If you specify choices for an option, these are the only valid values a user may pick.
+:::
+
+### Message Commands
+
+Message commands are a type of application command that is visible in the right click context menu of a message.
+
+Message commands, unlike chat input, do not support options or descriptions.
+
+### User Commands
+
+User commands are a type of application command that is visible in the right click context menu of a user.
+
+User commands, unlike chat input, do not support options or descriptions.
+
+## Buttons
+
+:::note
+For information on how to use buttons, see [here](/interactions/buttons).
+:::
+
+Buttons are interactive components on a Message. Similar to the old-school reaction buttons, these provide cleaner UI/UX than a small reaction button and are the preferred way of handling such inputs now.
+
+Buttons must be inside an `ActionRow`
+
+:::caution
+You can have up to 5 `ActionRow`s per message, and up to 5 `Button`s within each `ActionRow`.
+:::
+
+### Button Styles
+
+Button styles offer a number of ways for a button to display
+
+| Style     | Description                            |
+|-----------|----------------------------------------|
+| PRIMARY   | A blurple button                       |
+| SECONDARY | A grey button                          |
+| SUCCESS   | A green button                         |
+| DANGER    | A red button                           |
+| LINK      | A grey button, that navigates to a URL |
+
+<img src="/img/interactions/button-styles.png" />
+
+:::caution
+`LINK` style buttons cannot have a `custom_id` and will not send an interaction event when a user clicks on it.
+:::
+
+### Disabled buttons
+
+Buttons can be disabled to prevent user interaction. When set to `disabled` the button will appear grayed out.
+<img src="/img/interactions/disabled-button.png" />
+
+### Emoji Buttons
+
+Buttons can also display an emoji rather than text if desired
+<img src="/img/interactions/emoji-button.png" />
+
+## Select Menus
+
+:::note
+For information on how to use Select menus, see [here](/interactions/select-menus).
+:::
+
+...
+
+## See Also
+* [Discord Documentation on Application Commands](https://discord.com/developers/docs/interactions/application-commands)
