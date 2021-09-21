@@ -76,6 +76,8 @@ Buttons must be inside an `ActionRow`
 
 :::caution
 You can have up to 5 `ActionRow`s per message, and up to 5 `Button`s within each `ActionRow`.
+
+Action rows with buttons cannot have select menus.
 :::
 
 ### Button Styles
@@ -109,10 +111,19 @@ Buttons can also display an emoji rather than text if desired
 ## Select Menus
 
 :::note
-For information on how to use Select menus, see [here](/interactions/select-menus).
+For information on how to use Select Menus, see [here](/interactions/select-menus).
 :::
 
-...
+Select menus allow a dropdown to be displayed on a message itself rather than only inside of the command input window.
+
+Like Buttons, select menus must be inside of an `ActionRow`
+
+:::caution
+You can have up to 5 `ActionRow`s per message, and only one select menu per `ActionRow`.
+
+Action rows with select menus cannot have buttons.
+:::
+
 
 ## See Also
 * [Discord Documentation on Application Commands](https://discord.com/developers/docs/interactions/application-commands)
