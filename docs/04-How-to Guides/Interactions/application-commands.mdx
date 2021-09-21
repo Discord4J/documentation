@@ -6,5 +6,261 @@ slug: /interactions/application-commands
 ---
 
 :::note
-This page is a continuation of the [Interactions Reference](/interactions) page which dives into *what* Interactions are.
+This page is a continuation of the [Interactions (Reference)](/interactions) which dives into *what* Interactions are.
 :::
+
+:::note
+This page uses a chat-input command as the example for all sections. But this code will work with all types of Application Commands.
+:::
+
+## Lifecycle
+
+### Creating a Command
+
+Creating application commands are very easy, all you need to do is build the command's structure using the `ApplicationCommandRequest.Builder`.
+Then use the RestClient to make the request to discord.`
+
+#### Global Command
+
+```java
+// Get our application's ID
+long applicationId = client.getRestClient().getApplicationId().block();
+
+// Build our command's definition
+ApplicationCommandRequest greetCmdRequest = ApplicationCommandRequest.builder()
+    .name("greet")
+    .description("Greets You")
+    .addOption(ApplicationCommandOptionData.builder()
+        .name("name")
+        .description("Your name")
+        .type(3)
+        .required(true)
+        .build()
+    ).build();
+
+// Create the command with Discord
+client.getRestClient().getApplicationService()
+    .createGlobalApplicationCommand(applicationId, greetCmdRequest)
+    .subscribe();
+```
+
+:::tip
+`.type(3)` is the option type for `STRING`. See [Interactions (Reference) - Option Types](/interactions#option-types)
+:::
+
+#### Guild Command
+
+Creating a guild command is just as easy as creating a global command, the only extra info you need is the Guild's ID.
+
+```java
+// application ID and command definition are the same as the global command
+
+long guildId = 208023865127862272L; //Discord4J's server ID.
+
+client.getRestClient().getApplicationService()
+    .createGuildApplicationCommand(applicationId, guildId, greetCmdRequest)
+    .subscribe();
+```
+
+
+### Editing a Command
+
+To edit a command, we will use the same `ApplicationCommandRequest` we built in the last section.
+We also need the `ApplicationCommandData` that represents what discord knows about our commands.
+
+When editing commands, the following properties need to be compared:
+* `description`
+* `default_permission`
+* `options`
+
+All logic for comparing commands can be done with this simple method:
+
+```java
+private boolean hasChanged(ApplicationCommandData discordCommand, ApplicationCommandRequest command) {
+    // Check if description has changed.
+    if (!discordCommand.description().equals(command.description())) return true;
+
+    // Check if default permissions have changed (if not present, default to "true" according to discord)
+    boolean discordCommandDefaultPermission = discordCommand.defaultPermission().toOptional().orElse(true);
+    boolean commandDefaultPermission = command.defaultPermission().toOptional().orElse(true);
+
+    if (discordCommandDefaultPermission != commandDefaultPermission) return true;
+
+    //Check and return if options have changed.
+    return !discordCommand.options().equals(command.options());
+    }
+```
+
+#### Global Command
+
+```java
+// Get the commands from discord as a Map
+Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
+    .getApplicationService()
+    .getGlobalApplicationCommands(applicationId)
+    .collectMap(ApplicationCommandData::name)
+    .block();
+
+// Pull out the copy of the greet command
+ApplicationCommandData discordGreetCmd = discordCommands.get(greetCmdRequest.name());
+long discordGreetCmdId = Long.parseLong(discordGreetCmd.id())
+
+// Compare using our comparison method
+if (hasChanged(discordGreetCmd, greetCmdRequest)) {
+    client.getRestClient().getApplicationService()
+    .modifyGlobalApplicationCommand(applicationId, discordGreetCmdId, greetCmdRequest)
+    .subscribe();
+}
+```
+
+#### Guild Command
+
+```java
+long guildId = 208023865127862272L; //Discord4J's server ID.
+
+// Get the commands from discord as a Map
+Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
+    .getApplicationService()
+    .getGuildApplicationCommands(applicationId, guildId)
+    .collectMap(ApplicationCommandData::name)
+    .block();
+
+// Pull out the copy of the greet command
+ApplicationCommandData discordGreetCmd = discordCommands.get(greetCmdRequest.name());
+
+// Update if true
+if (hasChanged(discordGreetCmd, greetCmdRequest)) {
+    client.getRestClient().getApplicationService()
+        .modifyGuildApplicationCommand(applicationId, guildId, Long.parseLong(discordGreetCmd.id()), greetCmdRequest)
+        .subscribe();
+}
+```
+
+#### Bulk Overwrite
+
+:::warning
+This does **not** simply edit commands, but **replaces** them outright!
+:::
+
+You may have made large changes to your commands and would rather replace them instead of updating your existing commands.
+
+To do so, all you need is a list of `ApplicationCommandRequest` and use the following method:
+
+##### Global Command
+
+```java
+client.getRestClient().getApplicationService()
+    .bulkOverwriteGlobalApplicationCommand(applicationId, commandRequestList)
+    .subscribe();
+```
+
+##### Guild Command
+
+```java
+long guildId = 208023865127862272L; //Discord4J's server ID.
+
+client.getRestClient().getApplicationService()
+    .bulkOverwriteGuildApplicationCommand(applicationId, guildId, commandRequestList)
+    .subscribe();
+```
+
+
+### Deleting a Command
+
+Sometimes you just don't want a command anymore, in that case we can easily delete the commands we don't want.
+
+#### Global Command
+
+```java
+// Get the commands from discord as a Map
+Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
+    .getApplicationService()
+    .getGlobalApplicationCommands(applicationId)
+    .collectMap(ApplicationCommandData::name)
+    .block();
+
+// Get the ID of our greet command
+long commandId = Long.parseLong(discordCommands.get("greet").id());
+
+// Delete it
+client.getRestClient().getApplicationService()
+    .deleteGlobalApplicationCommand(applicationId, commandId)
+    .subscribe();
+```
+
+#### Guild Command
+
+```java
+long guildId = 208023865127862272L; //Discord4J's server ID.
+
+// Get the commands from discord as a Map
+Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
+    .getApplicationService()
+    .getGuildApplicationCommands(applicationId, guildId)
+    .collectMap(ApplicationCommandData::name)
+    .block();
+
+// Get the ID of our greet command
+long commandId = Long.parseLong(discordCommands.get("greet").id());
+
+// Delete it
+client.getRestClient().getApplicationService()
+    .deleteGuildApplicationCommand(applicationId, guildId, commandId)
+    .subscribe();
+```
+
+### Simplifying the Lifecycle
+
+:::note
+This section only applies to global commands currently. Feel free to suggestion changes/additions to include simplifying guild commands.
+:::
+
+Hardcoding commands can come with downsides. It's much harder to read and maintain the command structure and handle changes made to them.
+However, this can all be simplified easily.
+
+Instead of hardcoding the commands, we will put commands in `resources/commands` as their raw json form,
+and have a class dedicated to reading these files and handling all discord requests from above.
+
+We will maintain the following structure for our json files: `src/main/resources/commands/*.json`
+<img src="/img/interactions/command-file-structure.png"/>
+
+Application commands follow a simple json structure defined by Discord, our greet command's json looks like this:
+
+```json
+{
+    "name": "greet",
+    "description": "Greets you",
+    "options": [
+        {
+            "name": "name",
+            "description": "Your name",
+            "type": 3,
+            "required": true
+        }
+    ]
+}
+```
+
+To read these files and run our code, we will be using the `GlobalCommandRegistrar` found in our example project
+[here](https://github.com/Discord4J/example-projects/blob/master/gradle-simple-bot/src/main/java/com/novamaday/d4j/gradle/simplebot/GlobalCommandRegistrar.java)
+(due to its 100 line length, it cannot easily be in a code-block on this page).
+
+Once that file is in your project, all you need to do is call it after logging in:
+```java
+try {
+    new GlobalCommandRegistrar(client.getRestClient()).registerCommands();
+} catch (Exception e) {
+    //Handle exception
+}
+```
+
+:::tip
+Using the Spring Boot Framework, we can simplify this even more and remove the explicit call after logging in.
+See our Spring [Example Projects](https://github.com/Discord4J/example-projects) for more information.
+:::
+
+## Receiving and Responding
+
+## Further Reading
+* [Examples](/examples)
+* [Discord Docs - Application Commands](https://discord.com/developers/docs/interactions/application-commands)
