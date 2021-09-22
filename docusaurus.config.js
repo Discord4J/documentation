@@ -105,6 +105,7 @@ module.exports = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/Discord4J/documentation/edit/master/',
+          showLastUpdateTime: true,
         },
         // blog: {
         //   showReadingTime: true,
