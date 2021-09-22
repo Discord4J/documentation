@@ -261,6 +261,195 @@ See our Spring [Example Projects](https://github.com/Discord4J/example-projects)
 
 ## Receiving and Responding
 
+Discord provides 2 ways to receive commands. Either through the gateway, or via a webhook. In this section, we will cover the former.
+
+### Receiving Commands
+
+Every application command can be received with this simple code:
+
+```java
+client.on(ApplicationCommandInteractionEvent.class, event -> {
+    // logic
+}).subscribe();
+```
+
+However, you may not want *all* application commands, and might just want a slash command:
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    // logic
+}).subscribe();
+```
+
+For message commands and user commands use `MessageInteractionEvent` and `UserInteractionEvent` respectively
+
+### Responding to Commands
+
+
+There are multiple ways of responding to a command. The simplest would be `reply()`:
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        return event.reply("Pong!");
+    }
+}).subscribe();
+```
+
+:::caution
+When you receive and interaction, you have 3 seconds to respond before it times out.
+:::
+
+If you can return something immediately, we use `reply`.
+If it takes longer than 3 seconds to gather the data and respond, use `acknowledge` and when you are ready to respond with data, use `followup`
+
+When you use acknowledge, you have up to 15 minutes before the interaction is no longer valid.
+
+```java
+public static void main(String[] args) {
+    GatewayDiscordClient client = DiscordClientBuilder.create("token").build()
+        .login()
+        .block();
+
+    client.on(ChatInputInteractionEvent.class, event -> {
+        if (event.getCommandName().equals("ping")) {
+            return event.acknowledge().then(methodThatTakesALongTime(event));
+        }
+    }).subscribe();
+}
+
+private static Mono<MessageData> methodThatTakesALongTime(ChatInputInteractionEvent event) {
+    // Do logic that takes awhile, then return
+    return event.getInteractionResponse().createFollowupMessage("This took awhile!");
+}
+```
+
+### Ephemeral Responses
+
+When using `reply`/`acknowlege`/`followup` everyone in the channel can see this, not just the user that issued the command.
+
+Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephmeral` means that only the user who issued the command will see the response.
+
+To respond ephemerally, we add an extra line:
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        return event
+            .reply("Pong!")
+            .withEphemeral(true);
+    }
+}).subscribe();
+```
+
+:::note
+If you acknowledge ephemerally, you must use an ephemeral followup.
+
+The same goes in reverse, if you acknowledge normally, you must also follow up normally. Discord does not support mixing these response modifiers.
+:::
+
+Ephemeral messages technically do not exist (like the clyde bot messages you've likely seen). When the user's client refreshes or they switch to a different client, the ephemeral message will not be visible to them anymore.
+
+### Editing Responses
+After the initial response is sent, you may want to edit that response.
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        event.reply("Pong!").subscribe();
+
+        // Do something
+
+        event.getInteractionResponse().editInitialResponse(WebhookMessageEditRequest.builder()
+            .contentOrNull("Pong! Pong!")
+            .build()
+        ).subscribe();
+    }
+}).subscribe();
+```
+
+### Followups
+
+Sometimes, you might not want to send one response, but might want to send multiple. Fear not, Discord lets you send multiple followups as long as the interaction is valid for.
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        event.reply("Pong!").subscribe();
+
+        event.getInteractionResponse().createFollowupMessage("PingPing!").subscribe();
+        event.getInteractionResponse().createFollowupMessage("PongPong!").subscribe();
+    }
+}).subscribe();
+```
+
+### Handling Options
+
+:::note
+This only applies to `Chat Input` commands, `Message` and `User` commands do not support options.
+:::
+Unlike a ping command, our greet command from earlier accepts arguments, or `options`.
+
+To get an option and assign a default value, we can use something like this to do it reactively:
+```java
+Mono<String> optionMono = Mono.justOrEmpty(event.getOption("OPTION_NAME_HERE")
+    .flatMap(ApplicationCommandInteractionOption::getValue)
+    ).map(ApplicationCommandInteractionOptionValue::asString)
+    .defaultIfEmpty("YOUR DEFAULT VALUE");
+```
+
+To see what that looks like in practice:
+
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("greet")) {
+        /*
+        Since slash command options are optional according to discord, we will wrap it into the following function
+        that gets the value of our option as a Mono<String>, so that we may use it later on without
+        needing to call .get() several times on our optional values.
+
+        In this case, there is no fear the mono will return empty as this is marked "required: true" in our json.
+        */
+        Mono<String> nameMono = Mono.justOrEmpty(event.getOption("name")
+            .flatMap(ApplicationCommandInteractionOption::getValue)
+            ).map(ApplicationCommandInteractionOptionValue::asString);
+
+        return nameMono.flatMap(name -> {
+            //Reply to the command, with the name the user supplied
+            return event.reply()
+            .withEphemeral(true)
+            .withContent("Hello, " + name);
+        });
+    }
+}).subscribe();
+```
+
+### Getting and Deleting Responses
+
+:::warning
+You *cannot* get nor delete ephemeral messages.
+:::
+
+In addition to editing the initial response, you can also delete it.
+
+```java
+event.reply("pong!").subscribe();
+event.getInteractionResponse().deleteInitialResponse().subscribe();
+```
+
+Finally, you may want to get the initial reply data:
+
+```java
+event.reply("pong!").subscribe();
+MessageData message = event.getInteractionResponse().getInitialResponse().block();
+```
+
+## Permissions
+
+:::caution
+Discord is making major changes to the permission system in the near future. Permissions will be documented then.
+:::
+
 ## Further Reading
 * [Examples](/examples)
 * [Discord Docs - Application Commands](https://discord.com/developers/docs/interactions/application-commands)
