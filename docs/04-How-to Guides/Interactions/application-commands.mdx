@@ -18,7 +18,7 @@ This page uses a chat-input command as the example for all sections. But this co
 ### Creating a Command
 
 Creating application commands are very easy, all you need to do is build the command's structure using the `ApplicationCommandRequest.Builder`.
-Then use the RestClient to make the request to discord.`
+Then use the RestClient to make the request to discord.
 
 #### Global Command
 
@@ -241,8 +241,8 @@ Application commands follow a simple json structure defined by Discord, our gree
 }
 ```
 
-To read these files and run our code, we will be using the `GlobalCommandRegistrar` found in our example project
-[here](https://github.com/Discord4J/example-projects/blob/master/gradle-simple-bot/src/main/java/com/novamaday/d4j/gradle/simplebot/GlobalCommandRegistrar.java)
+To read these files and run our code, we will be using the `GlobalCommandRegistrar` found in our
+[Example Projects](https://github.com/Discord4J/example-projects/blob/master/gradle-simple-bot/src/main/java/com/novamaday/d4j/gradle/simplebot/GlobalCommandRegistrar.java)
 (due to its 100 line length, it cannot easily be in a code-block on this page).
 
 Once that file is in your project, all you need to do is call it after logging in:
@@ -348,7 +348,7 @@ If you acknowledge ephemerally, you must use an ephemeral followup.
 The same goes in reverse, if you acknowledge normally, you must also follow up normally. Discord does not support mixing these response modifiers.
 :::
 
-Ephemeral messages technically do not exist (like the clyde bot messages you've likely seen). When the user's client refreshes or they switch to a different client, the ephemeral message will not be visible to them anymore.
+Ephemeral messages technically do not exist (like the clyde bot messages you've likely seen). When the user's client refreshes, or they switch to a different client, the ephemeral message will not be visible to them anymore.
 
 ### Editing Responses
 After the initial response is sent, you may want to edit that response.
@@ -451,5 +451,5 @@ Discord is making major changes to the permission system in the near future. Per
 :::
 
 ## Further Reading
-* [Examples](/examples)
+* [Reference - Examples](/examples)
 * [Discord Docs - Application Commands](https://discord.com/developers/docs/interactions/application-commands)

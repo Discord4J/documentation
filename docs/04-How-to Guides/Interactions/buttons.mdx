@@ -11,8 +11,117 @@ This page is a continuation of the [Interactions (Reference)](/interactions) whi
 
 ## Creating Buttons
 
+Creating buttons is extremely easy with Discord4J. You can add buttons to any message the bot sends, including responses to application commands or other interactions!
+
+### Creating and sending buttons for a regular message
+
+```java
+// Whatever channel you want the message in
+Snowflake channelId = Snowflake.of(0);
+
+Button button = Button.primary("custom-id", "Click me!!");
+
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> channel.createMessage(
+        MessageCreateSpec.builder()
+        // Buttons must be in action rows
+        .addComponent(ActionRow.of(button))
+        .build()
+    )
+).subscribe();
+```
+
+### Buttons in a component response
+
+```java
+Button button = Button.success("custom-id", "Pong?");
+
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        return event.reply("Pong!")
+            .withComponents(ActionRow.of(button));
+    }
+}).subscribe();
+```
+
+### Link Buttons
+
+You may want to direct a user to a website when they click a button, to do this we use `Button.link()` as so:
+
+```java
+Button button = Button.link("https://discord4j.com", "Discord4J");
+```
+
+:::caution
+Link buttons do **not** send interaction events when clicked.
+:::
+
+
+### Disabled Buttons
+
+If you want to prevent a button from being used, you can easily set the button to being disabled.
+
+```java
+Button button = Button.danger("custom-id", "Danger!!").disabled();
+```
+
+This works for all button styles.
+
+### Emoji Buttons
+
+If you want an emoji displayed rather than a text label we would use the following code:
+
+```java
+// Custom non-animated emote
+ReactionEmoji customEmoji = ReactionEmoji.of(546687597246939136L, "d4j", false);
+Button customEmoteButton = Button.primary("custom-id", customEmoji);
+
+// Unicode emote
+ReactionEmoji unicodeEmoji = ReactionEmoji.unicode("\u2764");
+Button unicodeEmoteButton = Button.secondary("custom-id-2", unicodeEmoji);
+```
+
+:::note
+To get the ID of a specific custom emoji, put the emoji in chat, right click, and click `copy link`. In that link, is the emoji's ID.
+
+For example, the D4J emote in our server.
+Its link is: `https://cdn.discordapp.com/emojis/546687597246939136.png?v=1` and the ID is `546687597246939136`
+:::
+
 ## Using a Temporary Listener To Respond
 
+:::note
+If you would like to always respond to button interactions, you can easily do so by creating a custom listener just as we showed in
+[Application Commands - Receiving](/interactions/application-commands#receiving-commands), using the `ButtonInteractionEvent` class.
+:::
+
+Like Application Commands, buttons are always valid, no matter how much time has passed since the message was created. Responding to a button days, or weeks after its creation may not always be feasible.
+To counteract this, we can create a temporary listener that automatically times out.
+
+```java
+Button button = Button.primary("custom-id", "Click me!!");
+
+client.getChannelById(channelId).ofType(GuildMessageChannel.class).flatMap(channel -> {
+    Mono<Message> createMessageMono = channel.createMessage(MessageCreateSpec.builder()
+        .addComponent(ActionRow.of(button))
+        .build());
+
+    Mono<Void> tempListener = client.on(ButtonInteractionEvent.class, event -> {
+        if (event.getCustomId().equals("custom-id")) {
+            return event.reply("You clicked me!").withEphemeral(true);
+        } else {
+            // Ignore it
+            return Mono.empty();
+        }
+    }).timeout(Duration.ofMinutes(30)) // Timeout after 30 minutes
+    .then(); //Transform the flux to a mono
+
+    //Return both of the monos together
+    return createMessageMono.then(tempListener);
+}).subscribe();
+```
+
 ## Further Reading
-* [Examples](/examples)
+* [Reference - Examples](/examples)
 * [Discord Docs - Buttons](https://discord.com/developers/docs/interactions/message-components#buttons)
