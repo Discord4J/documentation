@@ -33,7 +33,7 @@ ApplicationCommandRequest greetCmdRequest = ApplicationCommandRequest.builder()
     .addOption(ApplicationCommandOptionData.builder()
         .name("name")
         .description("Your name")
-        .type(3)
+        .type(ApplicationCommandOption.Type.STRING.getValue())
         .required(true)
         .build()
     ).build();
@@ -43,10 +43,6 @@ client.getRestClient().getApplicationService()
     .createGlobalApplicationCommand(applicationId, greetCmdRequest)
     .subscribe();
 ```
-
-:::tip
-`.type(3)` is the option type for `STRING`. See [Interactions (Reference) - Option Types](/interactions#option-types)
-:::
 
 #### Guild Command
 
@@ -240,6 +236,10 @@ Application commands follow a simple json structure defined by Discord, our gree
     ]
 }
 ```
+
+:::tip
+`"type": 3` is the option type for `STRING`. See [Interactions (Reference) - Option Types](/interactions#option-types)
+:::
 
 To read these files and run our code, we will be using the `GlobalCommandRegistrar` found in our
 [Example Projects](https://github.com/Discord4J/example-projects/blob/master/gradle-simple-bot/src/main/java/com/novamaday/d4j/gradle/simplebot/GlobalCommandRegistrar.java)

@@ -100,26 +100,33 @@ Like Application Commands, buttons are always valid, no matter how much time has
 To counteract this, we can create a temporary listener that automatically times out.
 
 ```java
+// Whatever channel you want the message in
+Snowflake channelId = Snowflake.of(0);
+
 Button button = Button.primary("custom-id", "Click me!!");
 
-client.getChannelById(channelId).ofType(GuildMessageChannel.class).flatMap(channel -> {
-    Mono<Message> createMessageMono = channel.createMessage(MessageCreateSpec.builder()
-        .addComponent(ActionRow.of(button))
-        .build());
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> {
+        Mono<Message> createMessageMono = channel.createMessage(MessageCreateSpec.builder()
+            .addComponent(ActionRow.of(button))
+            .build());
 
-    Mono<Void> tempListener = client.on(ButtonInteractionEvent.class, event -> {
-        if (event.getCustomId().equals("custom-id")) {
-            return event.reply("You clicked me!").withEphemeral(true);
-        } else {
-            // Ignore it
-            return Mono.empty();
-        }
-    }).timeout(Duration.ofMinutes(30)) // Timeout after 30 minutes
-    .then(); //Transform the flux to a mono
+        Mono<Void> tempListener = client.on(ButtonInteractionEvent.class, event -> {
+            if (event.getCustomId().equals("custom-id")) {
+                return event.reply("You clicked me!").withEphemeral(true);
+            } else {
+                // Ignore it
+                return Mono.empty();
+            }
+        }).timeout(Duration.ofMinutes(30)) // Timeout after 30 minutes
+        // Handle TimeoutException that will be thrown when the above times out
+        .onErrorResume(TimeoutException.class, ignore -> Mono.empty())
+        .then(); //Transform the flux to a mono
 
-    //Return both of the monos together
-    return createMessageMono.then(tempListener);
-}).subscribe();
+        //Return both of the monos together
+        return createMessageMono.then(tempListener);
+    }).subscribe();
 ```
 
 ## Further Reading

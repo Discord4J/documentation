@@ -9,9 +9,165 @@ slug: /interactions/select-menus
 This page is a continuation of the [Interactions (Reference)](/interactions) which dives into *what* Interactions are.
 :::
 
-## Creating Buttons
+## Creating Select Menus
+
+Creating Select Menus is extremely easy with Discord4J. You can add select menus to any message the bot sends, including responses to application commands or other interactions!
+
+### Creating and sending select menus for a regular message
+
+```java
+// Whatever channel you want the message in
+Snowflake channelId = Snowflake.of(0);
+
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2"),
+    SelectMenu.Option.of("label3", "value2")
+);
+
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> channel.createMessage(
+        MessageCreateSpec.builder()
+        .content("Select Something!")
+        // Select Menus must be in action rows
+        .addComponent(ActionRow.of(select))
+        .build()
+    )
+).subscribe();
+```
+
+### Select menus in a component response
+
+```java
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2"),
+    SelectMenu.Option.of("label3", "value2")
+);
+
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        return event.reply("Pong!")
+            .withComponents(ActionRow.of(select));
+    }
+}).subscribe();
+```
+
+### Setting how many values a user may pick
+
+Sometimes you may want to have a select menu where a user can pick multiple values rather than just one.
+To set a minimum amount of values a user must pick: `.withMinValues(AMOUNT)`
+And to set a maximum amount of values a user can pick: `.withMaxValues(AMOUNT)`
+
+These methods can be used together to enable more complex select menu actions:
+
+```java
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.ofDefault("default-label", "Default Value!"),
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2")
+).withMaxValues(3).withMinValues(1);
+```
+
+### Disabled select menus
+
+If you want to prevent a select menu from being used, you can easily set it to being disabled.
+
+```java
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.ofDefault("default-label", "Default Value!"),
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2")
+).disabled();
+```
+
+### Placeholder text
+
+Placeholder text can be used when you don't wish to have a default selected value. This text will appear when no value is selected and can easily be done like so:
+
+```java
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2")
+).withPlaceholder("Please select an option <3");
+```
+
+### Default selected value
+
+You may want to have a default value selected for the user, luckily discord supports this and D4J implements this cleanly.
+All you need to do is create an option as follows:
+
+```java
+SelectMenu.Option.ofDefault("default-label", "Default Value!")
+```
+
+### Adding descriptions to options
+
+Helping users understand the options they are picking is important. Sometimes, the context is clear and a description is unneeded, but if there needs to be a description, this can easily be achieved.
+
+```java
+SelectMenu.Option option = SelectMenu.Option.of("Label", "value").withDescription("My Description");
+```
+
+### Emoji options
+
+If you want an emoji displayed rather than a text label we would use the following code:
+
+```java
+// Custom non-animated emote
+ReactionEmoji customEmoji = ReactionEmoji.of(546687597246939136L, "d4j", false);
+SelectMenu.Option customEmoteOption = SelectMenu.Option.of("label", "value").withEmoji(customEmoji);
+
+// Unicode emote
+ReactionEmoji unicodeEmoji = ReactionEmoji.unicode("\u2764");
+SelectMenu.Option unicodeEmoteOption = SelectMenu.Option.of("label", "value").withEmoji(unicodeEmoji);
+```
 
 ## Using a Temporary Listener To Respond
+
+:::note
+If you would like to always respond to select menu interactions, you can easily do so by creating a custom listener just as we showed in
+[Application Commands - Receiving](/interactions/application-commands#receiving-commands), using the `SelectMenuInteractionEvent` class.
+:::
+
+Like Application Commands, select menus are always valid, no matter how much time has passed since the message was created. Responding to a select menu days, or weeks after its creation may not always be feasible. To counteract this, we can create a temporary listener that automatically times out.
+
+```java
+// Whatever channel you want the message in
+Snowflake channelId = Snowflake.of(0);
+
+SelectMenu select = SelectMenu.of("custom-id",
+    SelectMenu.Option.of("label", "value"),
+    SelectMenu.Option.of("label2", "value2")
+).withPlaceholder("Please select an option <3");
+
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> {
+        Mono<Message> createMessageMono = channel.createMessage(MessageCreateSpec.builder()
+            .addComponent(ActionRow.of(select))
+            .build());
+
+        Mono<Void> tempListener = client.on(SelectMenuInteractionEvent.class, event -> {
+            if (event.getCustomId().equals("custom-id")) {
+                //Get all selected values
+                String values = event.getValues().toString().replace("[", "").replace("]", "");
+                return event.reply("You selected these values: " + values).withEphemeral(true);
+            } else {
+                // Ignore it
+                return Mono.empty();
+            }
+        }).timeout(Duration.ofMinutes(30)) // Timeout after 30 minutes
+        // Handle TimeoutException that will be thrown when the above times out
+        .onErrorResume(TimeoutException.class, ignore -> Mono.empty())
+        .then(); //Transform the flux to a mono
+
+        //Return both of the monos together
+        return createMessageMono.then(tempListener);
+    }).subscribe();
+```
+
 
 ## Further Reading
 * [Reference - Examples](/examples)
