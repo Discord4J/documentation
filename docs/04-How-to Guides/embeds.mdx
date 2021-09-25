@@ -1,0 +1,131 @@
+---
+id: embeds
+title: Embeds
+sidebar_label: Embeds
+slug: /embeds
+---
+
+You've likely seen embeds before. They're a great way to display information to a user in a clean way.
+
+In this section we will cover how to create and customize embeds.
+
+## Preview
+
+Here is an example of what embeds can look like.
+
+<img src="/img/embed-preview.png" />
+
+## Building the Embed
+
+Discord4J uses [Immutable Specs](/specs) to build objects, for to build embeds we use `EmbedCreatSpec.builder()`.
+
+```java
+EmbedCreateSpec embed = EmbedCreateSpec.builder()
+    .color(Color.BLUE)
+    .title("Title")
+    .url("https://discord4j.com")
+    .author("Some Name", "https://discord4j.com", "https://i.imgur.com/F9BhEoz.png")
+    .description("a description")
+    .thumbnail("https://i.imgur.com/F9BhEoz.png")
+    .addField("field title", "value", false)
+    .addField("\u200B", "\u200B", false)
+    .addField("inline field", "value", true)
+    .addField("inline field", "value", true)
+    .addField("inline field", "value", true)
+    .image("https://i.imgur.com/F9BhEoz.png")
+    .timestamp(Instant.now())
+    .footer("footer", "https://i.imgur.com/F9BhEoz.png")
+    .build();
+
+client.getChannelById(Snowflake.of(CHANNEL_ID))
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> channel.createMessage(embed))
+    .subscribe();
+```
+
+Embeds can also be sent when the message contains content:
+
+```java
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> channel.createMessage(MessageCreateSpec.builder()
+        .content("A meaningful quote from a good movie")
+        .addEmbed(embed)
+        .build()
+    )).subscribe();
+```
+
+:::tip
+All embed properties are optional. If you want a simpler embed, you can leave out what you don't want.
+:::
+
+### Embed Colors
+
+Discord4J uses a custom `Color` class when a color param is needed. But, you may want more color choices than the default enum provides.
+
+```java
+Color rgbColor = Color.of(rr, gg, bb);
+
+Color hexColor = Color.of(0xAABBCC);
+```
+
+### Blank Fields
+
+Discord enforces that embed fields and their values contain characters. However, you can "bypass" this restriction by using a zero-width space. To use a ZWS, just use `"\u200B"` as shown in the example above.
+
+## Attaching Images
+
+Like other messages, images can be directly attached to the message and the embed can use the image from the attachment.
+
+Using `attachment://filename.extension` as the image URL, an embed can reference the image attached.
+
+:::tip
+If you plan on attaching the same image many times, consider hosting it online and providing the URL to it.
+
+This helps reduce your bandwidth and increase bot response time as you no longer need to upload the image every time its embedded.
+:::
+
+```java
+EmbedCreateSpec embed = EmbedCreateSpec.builder()
+    ...
+    .image("attachment://file-name.png")
+    .build();
+
+client.getChannelById(channelId)
+    .ofType(GuildMessageChannel.class)
+    .flatMap(channel -> channel.createMessage(MessageCreateSpec.builder()
+        .content("content? content")
+        .addFile("file-name.png", fileAsInputStream)
+        .addEmbed(embed)
+        .build()
+    )).subscribe();
+```
+
+## Quirks and Features
+
+* If you want 2 or more fields side-by-side, they must have `inline: true`
+* The timestamp in the footer, like other timestamps across the client, adjusts to the user's locale
+* Mentions will only render correctly in the description and field values.
+* Mentions in embeds will not ping users
+* Embeds allow markdown. Field values and description support markdown links.
+
+However, there are some limitations to embeds
+* Titles are limited to `256` characters
+* Descriptions are limited to `4096` characters
+* Each embed can have up to `25` fields
+* A field's name is limited to `256` characters and its value to `1024` characters
+* The footer is limited to `2048` characters
+* The author name is limited to `256` characters
+* Up to `10` embeds can be included in a single message
+* The total length (of the raw json) of all embeds in a message cannot exceed `6000` characters
+
+And the biggest thing to remember:
+Embeds are rendered client-side and as such, may look different screen-to-screen depending on screen size.
+
+It's always a good idea to plan out and test how your embeds look on desktop and mobile screens.
+
+## Further Reading
+* [Reference - Specs](/specs)
+* [Discord Docs - Embed Limits](https://discord.com/developers/docs/resources/channel#embed-limits)
+* [Autocode Embed Visualizer (unaffiliated)](https://autocode.com/tools/discord/embed-builder/)
+
