@@ -301,9 +301,9 @@ When you receive and interaction, you have 3 seconds to respond before it times 
 :::
 
 If you can return something immediately, we use `reply`.
-If it takes longer than 3 seconds to gather the data and respond, use `acknowledge` and when you are ready to respond with data, use `followup`
+If it takes longer than 3 seconds to gather the data and respond, use `deferReply()` and when you are ready to respond with data, use `followup`
 
-When you use acknowledge, you have up to 15 minutes before the interaction is no longer valid.
+When you use defer, you have up to 15 minutes before the interaction is no longer valid.
 
 ```java
 public static void main(String[] args) {
@@ -313,20 +313,20 @@ public static void main(String[] args) {
 
     client.on(ChatInputInteractionEvent.class, event -> {
         if (event.getCommandName().equals("ping")) {
-            return event.acknowledge().then(methodThatTakesALongTime(event));
+            return event.deferReply().then(methodThatTakesALongTime(event));
         }
     }).subscribe();
 }
 
-private static Mono<MessageData> methodThatTakesALongTime(ChatInputInteractionEvent event) {
+private static Mono<Message> methodThatTakesALongTime(ChatInputInteractionEvent event) {
     // Do logic that takes awhile, then return
-    return event.getInteractionResponse().createFollowupMessage("This took awhile!");
+    return event.createFollowup("This took awhile!");
 }
 ```
 
 ### Ephemeral Responses
 
-When using `reply`/`acknowlege`/`followup` everyone in the channel can see this, not just the user that issued the command.
+When using `reply`/`deferReply`/`followup` everyone in the channel can see this, not just the user that issued the command.
 
 Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephmeral` means that only the user who issued the command will see the response.
 
@@ -342,10 +342,20 @@ client.on(ChatInputInteractionEvent.class, event -> {
 }).subscribe();
 ```
 
-:::note
-If you acknowledge ephemerally, you must use an ephemeral followup.
+And to `deferReply` ephemerally:
 
-The same goes in reverse, if you acknowledge normally, you must also follow up normally. Discord does not support mixing these response modifiers.
+```java
+client.on(ChatInputInteractionEvent.class, event -> {
+    if (event.getCommandName().equals("ping")) {
+        return event.deferReply().withEphemeral(true);
+    }
+}).subscribe();
+```
+
+:::note
+If you `deferReply` ephemerally, you must use an ephemeral followup.
+
+The same goes in reverse, if you `deferReply` normally, you must also follow up normally. Discord does not support mixing these response modifiers.
 :::
 
 Ephemeral messages technically do not exist (like the clyde bot messages you've likely seen). When the user's client refreshes, or they switch to a different client, the ephemeral message will not be visible to them anymore.
@@ -360,9 +370,9 @@ client.on(ChatInputInteractionEvent.class, event -> {
 
         // Do something
 
-        event.getInteractionResponse().editInitialResponse(WebhookMessageEditRequest.builder()
-            .contentOrNull("Pong! Pong!")
+        event.editReply(InteractionReplyEditSpec.builder()
             .build()
+            .withContentOrNull("Pong! Pong!")
         ).subscribe();
     }
 }).subscribe();
@@ -377,8 +387,8 @@ client.on(ChatInputInteractionEvent.class, event -> {
     if (event.getCommandName().equals("ping")) {
         event.reply("Pong!").subscribe();
 
-        event.getInteractionResponse().createFollowupMessage("PingPing!").subscribe();
-        event.getInteractionResponse().createFollowupMessage("PongPong!").subscribe();
+        event.createFollowup("PingPing!").subscribe();
+        event.createFollowup("PongPong!").subscribe();
     }
 }).subscribe();
 ```
