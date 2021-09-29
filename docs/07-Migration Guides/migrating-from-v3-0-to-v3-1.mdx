@@ -11,7 +11,7 @@ slug: /migrating-from-v3-0-to-v3-1
 If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
 :::
 
-This document is meant to help you migrate your application to Discord4J v3.1 if you're already on v3.0. If not, please check our [guild](migrating-from-v2-x-to-v3-1) first.
+This document is meant to help you migrate your application to Discord4J v3.1 if you're already on v3.0. If not, please check our [guild](/migrating-from-v2-x-to-v3-1) first.
 
 Discord4J is transitioning to a new architecture where users are able to work with the library REST capabilities separately from real-time Gateway operations in an easier way than before.
 
@@ -19,7 +19,7 @@ In addition, spawning Gateway connections is treated separately from `DiscordCli
 
 While this means that a single `EventDispatcher` and `StateHolder` are shared across all shards controlled by a single `GatewayDiscordClient`, you are in control of what shards are connected to it (`DiscordClient` + Gateway capabilities = `GatewayDiscordClient`). This enables you to more easily setup distributed architectures where certain actions are coordinated even across multiple JVMs.
 
-For a more in-depth explanation of the new features and changes introduced check [What's new in v3.1](whats-new-in-v3-1) and [glossary](glossary).
+For a more in-depth explanation of the new features and changes introduced check [What's new in v3.1](/whats-new-in-v3-1) and [glossary](/glossary).
 
 ## Updating dependencies
 
@@ -348,8 +348,8 @@ The following strategies are available:
 
 ## Logging
 
-Logger structure has changed for v3.1, adding contextual information regarding gateway ID, shard ID, request bucket and request ID. For more details about the available loggers in this version, check our [Logging](logging) page.
+Logger structure has changed for v3.1, adding contextual information regarding gateway ID, shard ID, request bucket and request ID. For more details about the available loggers in this version, check our [Logging](/logging) page.
 
 ## Advanced features
 
-For more detailed list of changes and migration notes, please check [What's new in v3.1](whats-new-in-v3-1).
+For more detailed list of changes and migration notes, please check [What's new in v3.1](/whats-new-in-v3-1).
