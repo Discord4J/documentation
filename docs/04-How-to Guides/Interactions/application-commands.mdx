@@ -74,7 +74,7 @@ All logic for comparing commands can be done with this simple method:
 ```java
 private boolean hasChanged(ApplicationCommandData discordCommand, ApplicationCommandRequest command) {
     // Check if description has changed.
-    if (!discordCommand.description().equals(command.description())) return true;
+    if (command.description().toOptional().map(value -> !existingCommand.description().equals(value)).orElse(false)) return true;
 
     // Check if default permissions have changed (if not present, default to "true" according to discord)
     boolean discordCommandDefaultPermission = discordCommand.defaultPermission().toOptional().orElse(true);
@@ -301,7 +301,7 @@ When you receive and interaction, you have 3 seconds to respond before it times 
 :::
 
 If you can return something immediately, we use `reply`.
-If it takes longer than 3 seconds to gather the data and respond, use `deferReply()` and when you are ready to respond with data, use `followup`
+If it takes longer than 3 seconds to gather the data and respond, use `deferReply` and when you are ready to respond with data, use `editReply` or `createFollowup`
 
 When you use defer, you have up to 15 minutes before the interaction is no longer valid.
 
@@ -326,7 +326,7 @@ private static Mono<Message> methodThatTakesALongTime(ChatInputInteractionEvent 
 
 ### Ephemeral Responses
 
-When using `reply`/`deferReply`/`followup` everyone in the channel can see this, not just the user that issued the command.
+When using `reply`/`deferReply`/`createFollowup` everyone in the channel can see this, not just the user that issued the command.
 
 Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephmeral` means that only the user who issued the command will see the response.
 
