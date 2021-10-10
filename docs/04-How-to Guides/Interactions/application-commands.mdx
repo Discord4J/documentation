@@ -74,7 +74,7 @@ All logic for comparing commands can be done with this simple method:
 ```java
 private boolean hasChanged(ApplicationCommandData discordCommand, ApplicationCommandRequest command) {
     // Check if description has changed.
-    if (command.description().toOptional().map(value -> !existingCommand.description().equals(value)).orElse(false)) return true;
+    if (command.description().toOptional().map(value -> !discordCommand.description().equals(value)).orElse(false)) return true;
 
     // Check if default permissions have changed (if not present, default to "true" according to discord)
     boolean discordCommandDefaultPermission = discordCommand.defaultPermission().toOptional().orElse(true);
