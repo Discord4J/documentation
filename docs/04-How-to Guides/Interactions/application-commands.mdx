@@ -286,7 +286,7 @@ For message commands and user commands use `MessageInteractionEvent` and `UserIn
 ### Responding to Commands
 
 
-There are multiple ways of responding to a command. The simplest would be `reply()`:
+There are multiple ways of responding to a command, for a list of available methods see [this section](/interactions#method-summary). The simplest would be `reply()`:
 
 ```java
 client.on(ChatInputInteractionEvent.class, event -> {
@@ -441,7 +441,7 @@ In addition to editing the initial response, you can also delete it.
 
 ```java
 event.reply("pong!").subscribe();
-event.getReply().flatMap(Message::delete).subscribe();
+event.deleteReply().subscribe();
 ```
 
 Finally, you may want to get the initial reply in another part of your code:

@@ -221,14 +221,63 @@ The following versions are affected and need to migrate to these types when upgr
 
 #### Webhook execution
 
-If you used `WebhookMultipartRequest` for your slash command application in v3.1 you now have to migrate to `MultipartRequest<WebhookExecuteRequest>`.
+Interactions use the webhook execution feature under the hood that was backported from v3.2 to v3.1. In particular, if
+you used `WebhookMultipartRequest` for your slash command application in v3.1 you now have to migrate to
+`MultipartRequest<WebhookExecuteRequest>`:
+
+```java
+WebhookMultipartRequest request = new WebhookMultipartRequest(body);
+```
+
+Becomes one of these, depending on whether you include attachments to it or not:
+
+```java
+MultipartRequest<WebhookExecuteRequest> request = MultipartRequest.ofRequest(body);
+MultipartRequest<WebhookExecuteRequest> request = MultipartRequest.ofRequestAndFiles(body, files);
+```
+
+However, starting from v3.2.0, it's less likely you need to directly call `MultipartRequest` for interactions, as there
+are `discord4j-core` methods available now, including the richer and fluent new request spec API:
+
+```java
+List<Tuple2<String, InputStream>> file = Collections.singletonList(Tuples.of("myAttachment.zip", inputStream));
+Mono<?> edit = press.getInteractionResponse()
+        .editInitialResponse(MultipartRequest.ofRequestAndFiles(
+                WebhookMessageEditRequest.builder()
+                        .contentOrNull("Wow, a new attachment!")
+                        .components(Collections.singletonList(row.getData()))
+                        .build(), file));
+return press.acknowledge().then(edit);
+```
+
+Can now be migrated to new methods without relying on `getInteractionResponse()`:
+
+```java
+MessageCreateFields.File file = MessageCreateFields.File.of("myAttachment.zip", inputStream);
+Mono<?> edit = press.editReply()
+        .withContentOrNull("Wow, a new attachment!")
+        .withFiles(getFile())
+        .withComponents(row);
+return press.deferEdit().then(edit);
+```
+
+This also applies to `event.getInteractionResponse().createFollowupResponse(...)` that is now available at
+`event.createFollowup()` using the new APIs. For a summary of methods available under this new API,
+see [this section](/interactions#method-summary).
+
+To see the changes in action, check our [Examples](/examples) page.
+
+#### Ephemeral variants
 
 For example, to reply ephemerally to a command, the below code can now be used:
 ```java
-ChatInputInteractionEvent#reply("Content!")
+// event is a ChatInputInteractionEvent
+event.reply("Content!")
     .withEphemeral(true)
     .subscribe();
 ```
+
+This is now recommended over calling `*Ephemeral` methods.
 
 For more information regarding how to respond to slash commands with the new method, see [Application Commands - Responding](/interactions/application-commands#responding-to-commands)
 

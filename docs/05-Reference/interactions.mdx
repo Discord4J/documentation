@@ -130,6 +130,34 @@ You can have up to 5 `ActionRow`s per message, and only one select menu per `Act
 Action rows with select menus cannot have buttons.
 :::
 
+## Method summary
+
+When you receive an interaction event, you can choose how to handle it, but it must be only **one** of the following
+and must be completed within a three-second window after Discord sends the interaction event.
+
+| Method     | Application Command events            |
+|------------|---------------------------------------|
+| deferReply | No message, user sees a loading state |
+| reply      | Include a message                     |
+
+| Method     | Component events                                  |
+|------------|---------------------------------------------------|
+| deferReply | No message, user sees a loading state             |
+| reply      | Include a message                                 |
+| deferEdit  | No message, user **does not** see a loading state |
+| edit       | Update the message that originated the event      |
+
+After the initial response is complete, you can work with the interaction using the following methods:
+
+| Method         | Any Interaction event                   |
+|----------------|-----------------------------------------|
+| editReply      | Update the initial response             |
+| getReply       | Fetch the initial response              |
+| deleteReply    | Delete the initial response             |
+| createFollowup | Create a followup message               |
+| editFollowup   | Update a followup message, given its ID |
+| deleteFollowup | Delete a followup message, given its ID |
+
 
 ## Further Reading
 * [How-to Guides - Application Commands](/interactions/application-commands)
