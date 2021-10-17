@@ -402,10 +402,10 @@ Unlike a ping command, our greet command from earlier accepts arguments, or `opt
 
 To get an option and assign a default value, we can use something like this to do it reactively:
 ```java
-Mono<String> optionMono = Mono.justOrEmpty(event.getOption("OPTION_NAME_HERE")
-    .flatMap(ApplicationCommandInteractionOption::getValue)
-    ).map(ApplicationCommandInteractionOptionValue::asString)
-    .defaultIfEmpty("YOUR DEFAULT VALUE");
+String name = event.getOption("name")
+            .flatMap(ApplicationCommandInteractionOption::getValue)
+            .map(ApplicationCommandInteractionOptionValue::asString)
+            .orElse("Your default value");
 ```
 
 To see what that looks like in practice:
@@ -415,21 +415,18 @@ client.on(ChatInputInteractionEvent.class, event -> {
     if (event.getCommandName().equals("greet")) {
         /*
         Since slash command options are optional according to discord, we will wrap it into the following function
-        that gets the value of our option as a Mono<String>, so that we may use it later on without
-        needing to call .get() several times on our optional values.
-
-        In this case, there is no fear the mono will return empty as this is marked "required: true" in our json.
-        */
-        Mono<String> nameMono = Mono.justOrEmpty(event.getOption("name")
+        that gets the value of our option as a String without chaining several .get() on all the optional values
+        In this case, there is no fear it will return empty/null as this is marked "required: true" in our json.
+         */
+        String name = event.getOption("name")
             .flatMap(ApplicationCommandInteractionOption::getValue)
-            ).map(ApplicationCommandInteractionOptionValue::asString);
+            .map(ApplicationCommandInteractionOptionValue::asString)
+            .get(); //This is warning us that we didn't check if its present, we can ignore this on required options
 
-        return nameMono.flatMap(name -> {
-            //Reply to the command, with the name the user supplied
-            return event.reply()
+        //Reply to the slash command, with the name the user supplied
+        return event.reply()
             .withEphemeral(true)
             .withContent("Hello, " + name);
-        });
     }
 }).subscribe();
 ```
