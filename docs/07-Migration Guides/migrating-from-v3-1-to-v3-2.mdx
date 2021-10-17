@@ -223,6 +223,15 @@ The following versions are affected and need to migrate to these types when upgr
 
 If you used `WebhookMultipartRequest` for your slash command application in v3.1 you now have to migrate to `MultipartRequest<WebhookExecuteRequest>`.
 
+For example, to reply ephemerally to a command, the below code can now be used:
+```java
+ChatInputInteractionEvent#reply("Content!")
+    .withEphemeral(true)
+    .subscribe();
+```
+
+For more information regarding how to respond to slash commands with the new method, see [Application Commands - Responding](/interactions/application-commands#responding-to-commands)
+
 ## Advanced features
 
 ### Directly querying a store

@@ -441,14 +441,14 @@ In addition to editing the initial response, you can also delete it.
 
 ```java
 event.reply("pong!").subscribe();
-event.getInteractionResponse().deleteInitialResponse().subscribe();
+event.getReply().flatMap(Message::delete).subscribe();
 ```
 
-Finally, you may want to get the initial reply data:
+Finally, you may want to get the initial reply in another part of your code:
 
 ```java
 event.reply("pong!").subscribe();
-MessageData message = event.getInteractionResponse().getInitialResponse().block();
+Message message = event.getReply().block();
 ```
 
 ## Permissions
