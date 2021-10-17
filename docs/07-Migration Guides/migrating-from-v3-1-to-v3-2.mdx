@@ -256,7 +256,7 @@ Can now be migrated to new methods without relying on `getInteractionResponse()`
 MessageCreateFields.File file = MessageCreateFields.File.of("myAttachment.zip", inputStream);
 Mono<?> edit = press.editReply()
         .withContentOrNull("Wow, a new attachment!")
-        .withFiles(getFile())
+        .withFiles(file)
         .withComponents(row);
 return press.deferEdit().then(edit);
 ```
