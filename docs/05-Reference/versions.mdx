@@ -8,11 +8,13 @@ slug: /versions
 The following table describes our current available versions, their support status, Discord API versions and
 compatibility with other projects like Spring Boot.
 
-| Discord4J                                                    | Support          | Gateway/API | Intents                                                                                                       | Interactions    | Reactor           | Spring Boot   | Artifact VERSION |
-| ------------------------------------------------------------ | ---------------- | ----------- | ------------------------------------------------------------------------------------------------------------- | ----------------| ----------------- | ------------- | ---------------- |
-| [v3.3.x](https://github.com/Discord4J/Discord4J/tree/master) | In development   | v9          | Mandatory, [non-privileged as default](https://discord.com/developers/docs/topics/gateway#privileged-intents) | Fully supported | 3.4 (2020)        | 2.3 and above | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.3.svg?label=&style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
-| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/master) | Current          | v8          | Mandatory, [non-privileged as default](https://discord.com/developers/docs/topics/gateway#privileged-intents) | Fully supported | 3.4 (2020)        | 2.3 and above | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.2.svg?label=&style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
-| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Maintenance Only | v6          | Optional, no intent default                                                                                   | Fully supported | 3.3 (Dysprosium)  | 2.2 and above | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?label=&style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+| Discord4J                                                    | Support          | Gateway/API  | Intents   | Reactor           | Spring Boot   | Artifact VERSION |
+| ------------------------------------------------------------ | ---------------- | ------------ | --------- | ----------------- | ------------- | ---------------- |
+| [v3.3.x](https://github.com/Discord4J/Discord4J/tree/master) | In development   | v9 (Threads) | Mandatory | 3.4 (2020)        | 2.3 and above | [Snapshots only](/using-snapshots) |
+| [v3.2.x](https://github.com/Discord4J/Discord4J/tree/3.2.x)  | Current          | v8           | Mandatory | 3.4 (2020)        | 2.3 and above | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.2.svg?label=&style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+| [v3.1.x](https://github.com/Discord4J/Discord4J/tree/3.1.x)  | Maintenance Only | v6           | Optional  | 3.3 (Dysprosium)  | 2.2 and above | [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?label=&style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core) |
+
+Discord API v8 and above require mandatory intents, Discord4J uses [non-privileged intents](https://discord.com/developers/docs/topics/gateway#privileged-intents) by default.
 
 All supported versions have JDK 8 baseline. Spring Boot compatibility is a general guideline as other versions might
 work through shading techniques for transitive libraries like Reactor and Netty.
@@ -21,6 +23,17 @@ work through shading techniques for transitive libraries like Reactor and Netty.
 branch.
 
 If you want to use experimental snapshot versions, refer to [Using Snapshots](/using-snapshots).
+
+## Recent features supported
+
+| Feature                                              | v3.3.x | v3.2.x | v3.1.x |
+| ---------------------------------------------------- | ------ | ------ | ------ |
+| [Slash commands](/interactions/application-commands) | Yes    | Yes    | Yes    |
+| [Buttons](/interactions/buttons)                     | Yes    | Yes    | Yes    |
+| [Select menus](/interactions/select-menus)           | Yes    | Yes    | Yes    |
+| Context menus                                        | Yes    | Yes    | Yes    |
+| Threads                                              | [Partial](https://github.com/Discord4J/Discord4J/issues/958) | No     | No     |
+| Guild stickers                                       | No     | No     | No     |
 
 ## Compatibility
 
