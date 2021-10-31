@@ -20,6 +20,12 @@ This page uses a chat-input command as the example for all sections. But this co
 Creating application commands are very easy, all you need to do is build the command's structure using the `ApplicationCommandRequest.Builder`.
 Then use the RestClient to make the request to discord.
 
+:::caution
+Global commands have a TTL of 1 hour. This means it will take up to 1 hour for a global command's changes to take effect in the discord client.
+
+We recommend using guild commands while developing and testing, and switching to global commands when ready to deploy.
+:::
+
 #### Global Command
 
 ```java
