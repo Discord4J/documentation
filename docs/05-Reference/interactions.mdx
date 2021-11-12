@@ -130,6 +130,18 @@ You can have up to 5 `ActionRow`s per message, and only one select menu per `Act
 Action rows with select menus cannot have buttons.
 :::
 
+## Auto Complete
+
+:::note
+For information on how to use Auto Complete, see [How-to Guides - Auto Complete](/interactions/auto-complete).
+:::
+
+Auto complete allows a bot to give the user suggestions when the user is typing a command option with auto complete enabled.
+It can be used for a variety of use cases, the most common being to suggest the correct input when more than 25 options are needed.
+It is only available for `STRING`, `NUMBER`, and `INTEGER` option types and up to 25 suggestions can be provided at a time.
+
+Unlike other interactions, auto complete cannot be deferred and requires only one response within 3 seconds.
+
 ## Method summary
 
 When you receive an interaction event, you can choose how to handle it, but it must be only **one** of the following
@@ -140,6 +152,10 @@ and must be completed within a three-second window after Discord sends the inter
 | deferReply | No message, user sees a loading state |
 | reply      | Include a message                     |
 
+| Method                 | Autocomplete events             |
+|------------------------|---------------------------------|
+| respondWithSuggestions | Up 25 choices will be displayed |
+
 | Method     | Component events                                  |
 |------------|---------------------------------------------------|
 | deferReply | No message, user sees a loading state             |
@@ -149,19 +165,20 @@ and must be completed within a three-second window after Discord sends the inter
 
 After the initial response is complete, you can work with the interaction using the following methods:
 
-| Method         | Any Interaction event                   |
-|----------------|-----------------------------------------|
-| editReply      | Update the initial response             |
-| getReply       | Fetch the initial response              |
-| deleteReply    | Delete the initial response             |
-| createFollowup | Create a followup message               |
-| editFollowup   | Update a followup message, given its ID |
-| deleteFollowup | Delete a followup message, given its ID |
+| Method         | Any DeferrableInteraction event                   |
+|----------------|---------------------------------------------------|
+| editReply      | Update the initial response                       |
+| getReply       | Fetch the initial response                        |
+| deleteReply    | Delete the initial response                       |
+| createFollowup | Create a followup message                         |
+| editFollowup   | Update a followup message, given its ID           |
+| deleteFollowup | Delete a followup message, given its ID           |
 
 
 ## Further Reading
 * [How-to Guides - Application Commands](/interactions/application-commands)
 * [How-to Guides - Buttons](/interactions/buttons)
 * [How-to Guides - Select Menus](/interactions/select-menus)
+* [How-to Guides - Auto Complete](/interactions/auto-complete)
 * [Discord Docs - Application Commands](https://discord.com/developers/docs/interactions/application-commands)
 * [Discord Docs - Message Components](https://discord.com/developers/docs/interactions/message-components)

@@ -1,0 +1,65 @@
+---
+id: auto-complete
+title: Auto Complete
+sidebar_label: Auto Complete
+slug: /interactions/auto-complete
+---
+
+:::note
+This page is a continuation of the [Interactions (Reference)](/interactions) which dives into *what* Interactions are.
+:::
+
+:::note
+Auto complete is currently only available for chat input commands.
+:::
+
+## Enabling Auto Complete
+
+To enable auto complete, just add `autocomplete: true` to a command option that supports autocomplete. It can only be
+added to the `STRING`, `NUMBER`, and `INTEGER` type options. Autocomplete cannot be used on commands that have `choices`
+provided.
+
+
+## Receiving and Responding
+
+Once auto complete is enabled on a command option, discord will automatically start sending auto complete interactions
+when a user is typing the parameter.
+
+:::caution
+Auto complete choices are only a suggestion! The user can choose to ignore the suggestions and input a custom value.
+:::
+
+```java
+client.on(ChatInputAutoCompleteEvent.class, event -> {
+    if (event.getCommandName().equals("commandName")) {
+        // Get the string value of what the user is currently typing
+        String typing = event.getFocusedOption().getValue()
+                .map(ApplicationCommandInteractionOptionValue::asString)
+                .orElse(""); // In case the user has not started typing, we return an empty string
+
+        /*
+        Build a list of choices to present to the user as suggested input
+
+        For the sake of simplicity in this demo, we are returning a static list here.
+        Ideally you would use fuzzy matching or other techniques to suggest up to 25 choices for the user.
+        */
+        List<ApplicationCommandOptionChoiceData> suggestions = new ArrayList<>();
+
+        suggestions.add(ApplicationCommandOptionChoiceData.builder().name("Thing 1").value("value").build());
+        suggestions.add(ApplicationCommandOptionChoiceData.builder().name("Something 2").value("other").build());
+        suggestions.add(ApplicationCommandOptionChoiceData.builder().name("some other input").value("pick me").build());
+
+        // Finally, return the list of choices to the user
+        return event.respondWithSuggestions(suggestions);
+    }
+}).subscribe();
+```
+
+Unlike other interactions, autocomplete cannot be deferred and only has one way to respond.
+The bot must respond within 3 seconds, failure to do so will result in a "soft failure" in the discord client; the user
+will still be able to use the command,but the autocomplete box will show an error.
+
+
+## Further Reading
+* [Reference - Examples](/examples)
+* [Discord Docs - Auto Complete](https://discord.com/developers/docs/interactions/application-commands#autocomplete)
