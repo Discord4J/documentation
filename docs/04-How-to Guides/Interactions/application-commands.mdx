@@ -26,6 +26,10 @@ Global commands have a TTL of 1 hour. This means it will take up to 1 hour for a
 We recommend using guild commands while developing and testing, and switching to global commands when ready to deploy.
 :::
 
+:::info
+These endpoints are idempotent, meaning commands that have not changed (and are included in the request) will not change.
+:::
+
 #### Global Command
 
 ```java
@@ -70,29 +74,6 @@ client.getRestClient().getApplicationService()
 To edit a command, we will use the same `ApplicationCommandRequest` we built in the last section.
 We also need the `ApplicationCommandData` that represents what discord knows about our commands.
 
-When editing commands, the following properties need to be compared:
-* `description`
-* `default_permission`
-* `options`
-
-All logic for comparing commands can be done with this simple method:
-
-```java
-private boolean hasChanged(ApplicationCommandData discordCommand, ApplicationCommandRequest command) {
-    // Check if description has changed.
-    if (command.description().toOptional().map(value -> !discordCommand.description().equals(value)).orElse(false)) return true;
-
-    // Check if default permissions have changed (if not present, default to "true" according to discord)
-    boolean discordCommandDefaultPermission = discordCommand.defaultPermission().toOptional().orElse(true);
-    boolean commandDefaultPermission = command.defaultPermission().toOptional().orElse(true);
-
-    if (discordCommandDefaultPermission != commandDefaultPermission) return true;
-
-    //Check and return if options have changed.
-    return !discordCommand.options().equals(command.options());
-    }
-```
-
 #### Global Command
 
 ```java
@@ -107,12 +88,10 @@ Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
 ApplicationCommandData discordGreetCmd = discordCommands.get(greetCmdRequest.name());
 long discordGreetCmdId = Long.parseLong(discordGreetCmd.id())
 
-// Compare using our comparison method
-if (hasChanged(discordGreetCmd, greetCmdRequest)) {
-    client.getRestClient().getApplicationService()
+// Modify command
+client.getRestClient().getApplicationService()
     .modifyGlobalApplicationCommand(applicationId, discordGreetCmdId, greetCmdRequest)
     .subscribe();
-}
 ```
 
 #### Guild Command
@@ -130,18 +109,20 @@ Map<String, ApplicationCommandData> discordCommands = client.getRestClient()
 // Pull out the copy of the greet command
 ApplicationCommandData discordGreetCmd = discordCommands.get(greetCmdRequest.name());
 
-// Update if true
-if (hasChanged(discordGreetCmd, greetCmdRequest)) {
-    client.getRestClient().getApplicationService()
-        .modifyGuildApplicationCommand(applicationId, guildId, Long.parseLong(discordGreetCmd.id()), greetCmdRequest)
-        .subscribe();
-}
+// Modify command
+client.getRestClient().getApplicationService()
+    .modifyGuildApplicationCommand(applicationId, guildId, Long.parseLong(discordGreetCmd.id()), greetCmdRequest)
+    .subscribe();
 ```
 
 #### Bulk Overwrite
 
 :::warning
 This does **not** simply edit commands, but **replaces** them outright!
+:::
+
+:::info
+These endpoints are idempotent, meaning commands that have not changed (and are included in the request) will not change.
 :::
 
 You may have made large changes to your commands and would rather replace them instead of updating your existing commands.
