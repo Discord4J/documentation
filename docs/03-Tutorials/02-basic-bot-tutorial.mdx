@@ -138,6 +138,7 @@ Mono<Void> login = client.withGateway((GatewayDiscordClient gateway) ->
           final User self = event.getSelf();
           System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator());
         })));
+    login.block();
 ```
 
 With this code, every occurrence of `ReadyEvent` is handled by printing the username and discriminator of the "self
