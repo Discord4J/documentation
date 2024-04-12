@@ -1,0 +1,55 @@
+---
+id: migrating-from-v3-2-to-v3-3
+title: Migrating from v3.2 to v3.3
+sidebar_label: Migrating from v3.2 to v3.3
+slug: /migrating-from-v3-2-to-v3-3
+---
+
+This article should help you update your bot from Discord4J v3.2.x to v3.3.0. This new major release is over a year in the making and has lots of changes.
+
+## Before you start
+
+:::note
+If you encounter an issue while following this guide or discover something missing, feel free to suggest changes or discuss them in our [server](https://discord.gg/d4j). Thanks!
+:::
+
+## Updating dependencies
+
+// TODO
+Discord4J v3.3 depends on Reactor 2020 release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.4.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 1.0.x). It maintains the JDK 8 baseline and includes other dependency upgrades like:
+
+- discord-json 1.6 (from 1.5)
+- jackson-databind 2.12 (from 2.11)
+- caffeine 2.8 (new dependency)
+
+### Gradle
+
+```groovy
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.discord4j:discord4j-core:3.3.0'
+}
+```
+
+### Maven
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.discord4j</groupId>
+        <artifactId>discord4j-core</artifactId>
+        <version>3.3.0</version>
+    </dependency>
+</dependencies>
+```
+
+## Discord4J features
+
+// TODO
+
+### Other features
+
+Check more details about the API and behavior changes in [What's new in v3.3](/whats-new-in-v3-3).
