@@ -16,10 +16,6 @@ module.exports = {
       indexName: 'discord4j',
       contextualSearch: false,
     },
-    gtag: {
-      trackingID: 'UA-100029628-1',
-      anonymizeIP: true,
-    },
     navbar: {
       title: 'Discord4J',
       logo: {
@@ -117,6 +113,10 @@ module.exports = {
         // },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        gtag: {
+          trackingID: 'UA-100029628-1',
+          anonymizeIP: true,
         },
       },
     ],
