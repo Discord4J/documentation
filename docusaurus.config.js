@@ -12,13 +12,10 @@ module.exports = {
   plugins: ['docusaurus-tailwindcss-loader'],
   themeConfig: {
     algolia: {
-      apiKey: '873fa3c2d55bb5c0e2ad7060b6b335b2',
+      appId: '6DF242GRRS',
+      apiKey: '2bdcf03980684f4e5a8138a52597b8a6',
       indexName: 'discord4j',
       contextualSearch: false,
-    },
-    gtag: {
-      trackingID: 'UA-100029628-1',
-      anonymizeIP: true,
     },
     navbar: {
       title: 'Discord4J',
@@ -117,6 +114,10 @@ module.exports = {
         // },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        gtag: {
+          trackingID: 'UA-100029628-1',
+          anonymizeIP: true,
         },
       },
     ],
