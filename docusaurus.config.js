@@ -2,7 +2,7 @@ module.exports = {
   title: 'Discord4J',
   tagline:
     'A reactive, modular, and performant REST/WS wrapper for the official Discord Bot API, built for the JVM ecosystem.',
-  url: 'https://discord4j.com/',
+  url: 'https://docs.discord4j.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -10,12 +10,14 @@ module.exports = {
   organizationName: 'Discord4J',
   projectName: 'Discord4J',
   plugins: ['docusaurus-tailwindcss-loader'],
+  trailingSlash: false,
   themeConfig: {
     algolia: {
       appId: '6DF242GRRS',
       apiKey: '2bdcf03980684f4e5a8138a52597b8a6',
       indexName: 'discord4j',
       contextualSearch: false,
+      ignoreCanonicalTo: true,
     },
     navbar: {
       title: 'Discord4J',
