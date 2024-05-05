@@ -2,7 +2,7 @@ module.exports = {
   title: 'Discord4J',
   tagline:
     'A reactive, modular, and performant REST/WS wrapper for the official Discord Bot API, built for the JVM ecosystem.',
-  url: 'https://docs.discord4j.com',
+  url: 'https://docs.discord4j.com/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
