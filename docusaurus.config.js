@@ -12,7 +12,8 @@ module.exports = {
   plugins: ['docusaurus-tailwindcss-loader'],
   themeConfig: {
     algolia: {
-      apiKey: '873fa3c2d55bb5c0e2ad7060b6b335b2',
+      appId: 'C7ZMMWOOHU',
+      apiKey: '23f0d33da13618a582ce398decede882',
       indexName: 'discord4j',
       contextualSearch: false,
     },
