@@ -2,4 +2,3 @@
 package = "@algolia/netlify-plugin-crawler"
     [plugins.inputs]
     branches = ['main', 'algolia-search']
-    template = "hierarchical"
