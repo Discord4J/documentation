@@ -13,11 +13,12 @@ module.exports = {
   trailingSlash: false,
   themeConfig: {
     algolia: {
-      appId: '6DF242GRRS',
-      apiKey: 'bf572460c1210a20050146245bb30071',
+      appId: 'LDN5ZQ6E5K',
+      apiKey: '136b3dfe329c09c3f3bf1da87e6aab89',
       indexName: 'discord4j',
       contextualSearch: false,
       ignoreCanonicalTo: true,
+      insights: true,
     },
     navbar: {
       title: 'Discord4J',
