@@ -18,7 +18,6 @@ module.exports = {
       indexName: 'discord4j',
       contextualSearch: false,
       ignoreCanonicalTo: true,
-      insights: true,
     },
     navbar: {
       title: 'Discord4J',
