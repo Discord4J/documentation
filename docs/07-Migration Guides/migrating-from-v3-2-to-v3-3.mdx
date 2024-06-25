@@ -46,6 +46,40 @@ dependencies {
 </dependencies>
 ```
 
+## Changes in discord-json
+### Class rename
+- `PositionModifyRequest`: This class has been split into two classes, `ChannelPositionModifyRequest` and `RolePositionModifyRequest`
+
+### Class hierarchy changed
+- `OnboardingData`: This interface now extends `BaseOnboardingData`. The `defaultChannelIds` and `enabled` methods were moved to the parent.
+- `OnboardingPromptData`: This interface now extends `BaseOnboardingPromptData`. The `type`, `title`, `singleSelect`, `required`, and `inOnboarding` methods were moved to the parent.
+- `OnboardingPromptOptionData`: This interface now extends `BaseOnboardingPromptOptionData`. The `channelsIds`, `rolesIds`, `title`, and `description` methods were moved to the parent.
+
+### Deprecation
+- `ApplicationInfoData#summary`: This field is deprecated and will be removed in Discord API v11. This field always returns an empty string.
+- `ApplicationCommandData#dmPermission`: Use `ApplicationCommandData#contexts` instead
+
+### Field type change
+- `ResolvedChannelData`:
+  - `name`: `String` -> `Possible<Optional<String>>`
+  - `permissions`: `String` -> `Possible<Optional<String>>`
+
+- `OnboardingPromptOptionData`:
+  - `emoji`: `EmojiData` -> `Possible<EmojiData>`
+
+- `ApplicationInfoData`:
+  - `owner`: `UserData` -> `Possible<PartialUserData>`
+
+- `ApplicationTeamMemberData`:
+  - `role`: `String` -> `Possible<String>`
+
+- `PositionModifyRequest` (now `ChannelPositionModifyRequest`):
+  - `position`: `int` -> `Possible<Optional<Integer>>`
+
+### Other changes
+- Remove Reactor dependency as it is unused in this repo, replaced `reactor.util.annotation.*` with `javax.annotation.*` from jsr305
+- Move classes in the encoding module to their own package (`discord4j.discordjson.encoding`) due to package name clashing with api module (issue when linking both modules in a project declaring a module-info.java)
+
 ## Discord4J features
 
 // TODO
