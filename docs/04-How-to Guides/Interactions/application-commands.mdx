@@ -315,7 +315,7 @@ private static Mono<Message> methodThatTakesALongTime(ChatInputInteractionEvent 
 
 When using `reply`/`deferReply`/`createFollowup` everyone in the channel can see this, not just the user that issued the command.
 
-Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephmeral` means that only the user who issued the command will see the response.
+Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephemeral` means that only the user who issued the command will see the response.
 
 To respond ephemerally, we add an extra line:
 
