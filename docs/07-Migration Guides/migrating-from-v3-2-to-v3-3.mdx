@@ -15,12 +15,13 @@ If you encounter an issue while following this guide or discover something missi
 
 ## Updating dependencies
 
-// TODO
-Discord4J v3.3 depends on Reactor 2020 release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.4.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 1.0.x). It maintains the JDK 8 baseline and includes other dependency upgrades like:
-
+Discord4J v3.3 depends on Reactor 2023 release train ([Reactor Core](https://github.com/reactor/reactor-core) 3.4.x and [Reactor Netty](https://github.com/reactor/reactor-netty) 1.0.x). It maintains the JDK 8 baseline and includes other dependency upgrades like:
 - discord-json 1.6 (from 1.5)
-- jackson-databind 2.12 (from 2.11)
-- caffeine 2.8 (new dependency)
+- jackson-databind 2.17 (from 2.12)
+- jackson-datatype 2.17 (from 2.12)
+- caffeine 2.9 (from 2.8)
+- immutables 2.10 (from 2.9)
+- jsr305 from com.google.code.findbugs 3.0 (new dependency)
 
 ### Gradle
 
@@ -76,14 +77,73 @@ dependencies {
 - `PositionModifyRequest` (now `ChannelPositionModifyRequest`):
   - `position`: `int` -> `Possible<Optional<Integer>>`
 
+## Changes in discord4j-core
+### Notable changes
+- Update gateway api version to 10
+- Calling any method that retreives restricted data (message content, embeds, etc.) without enabling the `MESSAGE_CONTENT` will raise an `UnsupportedOperationException`
+- Created a new interface, `TopLevelGuildMessageWithThreadsChannel` that extends `TopLevelGuildMessageChannel`, used for `TextChannel` and `NewsChannel`. This interface represents text channels that can have threads (A `VoiceChannel` is also a `TopLevelGuildMessageChannel` but cannot have threads).
+
+### Signature changes
+- `RestGuild#modifyChannelPositions` now takes a `List<ChannelPositionModifyRequest>` as parameter
+- `RestGuild#modifyRolePositions` now takes a `List<RolePositionModifyRequest>` as parameter
+- `GuildService#modifyGuildChannelPositions` now takes a `ChannelPositionModifyRequest[]` as parameter
+- `GuildService#modifyGuildRolePositions` now takes a `RolePositionModifyRequest[]` as parameter
+- `MessageCreateSpec#messageReference` now takes a `Possible<MessageReferenceData>`  as parameter
+- `MessageCreateMono#withMessageReference` now takes a `Possible<MessageReferenceData>`  as parameter
+
+- `ApplicationTeamMember#getRole` no longer returns `null` for the team owner, but `TeamMemberRole.ADMIN`
+- `ApplicationInfo#getOwnerId` now returns an `Optional<Snowflake>`
+- `RestGuild#modifyChannelPositions` now returns a `Flux<Void>`
+- `GuildService#modifyGuildChannelPositions` now returns a `Flux<Void>`
+- `MessageBulkDeleteEvent#getChannel` now returns a `Mono<MessageChannel>`
+- `VoiceState#getChannel` now returns a `Mono<AudioChannel>`
+- `ResolvedChannel#getName` now returns an `Optional<String>`
+- `ResolvedChannel#getEffectivePermissions` now returns an `Optional<PermissionSet>`
+
+- The `GuildEmoji` class now extends `Emoji`
+- The `Category` class now extends `BaseTopLevelGuildChannel`
+- The `GuildMessageChannel` class now extends `GuildChannel, MessageChannel`
+- The `PrivateChannel` class now extends `BaseChannel` and implements `MessageChannel`
+- The `StoreChannel` class now extends `BaseTopLevelGuildChannel` and implements `CategorizableChannel`
+- The `NewsChannel` class now extends `BaseTopLevelGuildChannel` and implements `TopLevelGuildMessageWithThreadsChannel`
+- The `TextChannel` class now extends `BaseTopLevelGuildChannel` and implements `TopLevelGuildMessageWithThreadsChannel`
+- The `VoiceChannel` class now extends `BaseTopLevelGuildChannel` and implements `AudioChannel, TopLevelGuildMessageChannel`
+
+- The method `User#equals` is no longer final
+
+- Renamed method `Guild#getGuildEmojiById` to `getEmojiById`
+- Renamed `VoiceChannelJoinSpec` to `AudioChannelJoinSpec`
+- Renamed `VoiceChannelJoinMono` to `AudioChannelJoinMono`
+
+- Removed field `Routes#NITRO_STICKER_PACKS_GET` to `Routes#STICKER_PACK_GET`
+
+### Removed methods and classes
+- Removed method `AutoModRule#edit(String name, EventType eventType, boolean enabled)`
+- Removed method `ClientException#isRetryContextStatusCode`
+- Removed deprecated method `Message#suppressEmbeds`
+- Removed deprecated method `RestGuild#modifyOwnNickname`
+- Removed deprecated method `ChannelService#suppressEmbeds`
+- Removed `com.iwebpp.crypto` classes
+- Removed class `BaseCategorizableChannel`
+- Removed class `BaseGuildChannel`
+- Removed class `BaseGuildMessageChannel`
+- Removed class `BaseMessageChannel`
+- Removed class `BaseTopLevelGuildMessageChannel`
+- Removed deprecated field `Routes#MESSAGE_SUPPRESS_EMBEDS`
+- Removed deprecated field `Routes#NICKNAME_MODIFY_OWN`
+
+### Deprecations
+- Deprecated method `IntegrationApplication#getSummary`
+- Deprecated method `Guild#getFeatures` (use `Guild#getGuildFeatures`)
+- Deprecated method `ApplicationInfo#isPublic` (use `ApplicationInfo#isBotPublic`)
+- Deprecated method `ApplicationInfo#requireCodeGrant` (use `ApplicationInfo#botRequiresCodeGrant`)
+- Deprecated method `ResolvedMember#getNicknameMention` (This type of ping has been deprecated in the Discord API)
+
 ### Other changes
+- Using an `AutoModRuleEditMono` or `AutoModRuleEditSpec` no longer require all fields to be set
 - Remove Reactor dependency as it is unused in this repo, replaced `reactor.util.annotation.*` with `javax.annotation.*` from jsr305
 - Move classes in the encoding module to their own package (`discord4j.discordjson.encoding`) due to package name clashing with api module (issue when linking both modules in a project declaring a module-info.java)
 
-## Discord4J features
-
-// TODO
-
-### Other features
-
+:::note
 Check more details about the API and behavior changes in [What's new in v3.3](/whats-new-in-v3-3).
+:::
