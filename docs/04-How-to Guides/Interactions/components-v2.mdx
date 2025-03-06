@@ -15,3 +15,10 @@ For use Components V2 you need to add the message flag `IS_COMPONENTS_V2` like t
 ```java
 MessageCreateSpec messageCreateSpec = MessageCreateSpec.create().withFlags(Message.Flag.IS_COMPONENTS_V2);
 ```
+
+## Limitations of Components V2
+
+- The ability to set the `content`, `embeds`, `stickers`, and `poll` field will be disabled
+- No support for audio files
+- No simple text preview for files
+- No embeds for urls
