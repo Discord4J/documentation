@@ -5,11 +5,37 @@ sidebar_label: Separators
 slug: /interactions/components/separators
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
 ## Separators
 
 :::note
-This require the use of Components V2.
+This require the use of [Components V2](/interactions/components-v2).
 :::
 
 Separator components allow you to divide components with a divider. You can make the divider big or small, and make it invisible if needed.
+
+```java
+.withComponents(
+        Container.of(
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+                Separator.of(),
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+                Separator.of(false),
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+                Separator.of(Separator.SpacingSize.LARGE),
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+                Separator.of(false, Separator.SpacingSize.LARGE),
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+        )
+)
+```
+
+<ThemedImage
+    sources={{
+        light: useBaseUrl('/img/interactions/components-v2/separator-light.png'),
+        dark: useBaseUrl('/img/interactions/components-v2/separator-dark.png'),
+    }}
+/>
 
