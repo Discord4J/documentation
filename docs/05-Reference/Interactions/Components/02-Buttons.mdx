@@ -1,0 +1,50 @@
+---
+id: buttons
+title: Buttons
+sidebar_label: Buttons
+slug: /interactions/components/buttons
+---
+
+## Buttons
+
+:::note
+For information on how to use buttons, see [How-to Guides - Buttons](/interactions/buttons).
+:::
+
+Buttons are interactive components on a Message. Similar to the old-school reaction buttons, these provide cleaner UI/UX than a small reaction button and are the preferred way of handling such inputs now.
+
+Buttons must be inside an `ActionRow`
+
+:::caution
+You can have up to 5 `Button`s within each `ActionRow`.
+
+Action rows with buttons cannot have select menus.
+:::
+
+### Button Styles
+
+Button styles offer a number of ways for a button to display
+
+| Style     | Description                            |
+|-----------|----------------------------------------|
+| PRIMARY   | A blurple button                       |
+| SECONDARY | A grey button                          |
+| SUCCESS   | A green button                         |
+| DANGER    | A red button                           |
+| LINK      | A grey button, that navigates to a URL |
+
+<img src="/img/interactions/button-styles.png" />
+
+:::caution
+`LINK` style buttons cannot have a `custom_id` and will not send an interaction event when a user clicks on it.
+:::
+
+### Disabled buttons
+
+Buttons can be disabled to prevent user interaction. When set to `disabled` the button will appear grayed out.
+<img src="/img/interactions/disabled-button.png" />
+
+### Emoji Buttons
+
+Buttons can also display an emoji rather than text if desired
+<img src="/img/interactions/emoji-button.png" />

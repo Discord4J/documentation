@@ -1,0 +1,45 @@
+---
+id: containers
+title: Containers
+sidebar_label: Containers
+slug: /interactions/components/containers
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+## Containers
+
+:::note
+This require the use of [Components V2](/interactions/components-v2).
+:::
+
+Containers are a new way to group components together. You can also specify an accent color (similar to embeds) and spoiler it.
+
+```java
+.withComponents(
+        Container.of(
+                TextDisplay.of("A container without color, not spoiled")
+        ),
+        Container.of(
+                Color.CINNABAR,
+                TextDisplay.of("A container with a color, not spoiled")
+        ),
+        Container.of(
+                true,
+                TextDisplay.of("A container without color, and spoiled")
+        ),
+        Container.of(
+                Color.CINNABAR,
+                true,
+                TextDisplay.of("A container with a color, and spoiled")
+        )
+)
+```
+
+<ThemedImage
+    sources={{
+        light: useBaseUrl('/img/interactions/components-v2/container-light.png'),
+        dark: useBaseUrl('/img/interactions/components-v2/container-dark.png'),
+    }}
+/>

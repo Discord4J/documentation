@@ -1,0 +1,89 @@
+---
+id: components-v2
+title: Components V2
+sidebar_label: Components V2
+slug: /interactions/components-v2
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+:::note
+This page is a continuation of the [Interactions (Reference)](/Reference/Interactions) which dives into *what* Interactions are.
+:::
+
+## What are "components V2"?
+
+"Components V2" is the name for a new Discord feature enabling to create new styles of messages, by assembling components.
+Now text, images, files, buttons, etc. are all "components" and can be placed (almost) everywhere and in (almost) any order!
+
+[//]: # (Here's a few examples of what is possible:)
+
+[//]: # (<ThemedImage)
+
+[//]: # (    alt="Screenshot of an example")
+
+[//]: # (    sources={{)
+
+[//]: # (        light: useBaseUrl&#40;'/img/interactions/components-v2/examples/example-1-light.png'&#41;,)
+
+[//]: # (        dark: useBaseUrl&#40;'/img/interactions/components-v2/examples/example-1-dark.png'&#41;,)
+
+[//]: # (    }})
+
+[//]: # (/>)
+
+## Enable Components V2
+
+To use Components V2, you need to add the message flag `IS_COMPONENTS_V2` when creating or editing the message.
+```java
+MessageCreateSpec messageCreateSpec = MessageCreateSpec.create().withFlags(Message.Flag.IS_COMPONENTS_V2);
+```
+
+:::note
+When using the `withComponents` method, like in `event.reply().withComponents(...)`, or `channel.createMessage().withComponents(...)`; there's no need to add the flag, it will automatically be added.
+:::
+
+## Limitations of Components V2
+
+- The ability to set the `content`, `embeds`, `stickers`, and `poll` field will be disabled
+- No support for audio files
+- No simple text preview for files
+- No embeds for urls
+
+## Component IDs
+
+Unlike buttons or select menu for instance, not all components have custom ids. Instead, a new id system has beed added, with incremental ids. Theses can either be manually set when creating the message or automatically attributed by Discord.
+
+### Setting the component ID
+```Java
+Container container = Container.of(
+        1, // <-- the component id
+        ...
+);
+```
+
+### Get a component by its ID
+```Java
+Optional<BaseMessageComponent> componentOptional = message.getComponentById(1);
+if (componentOptional.isPresent()) {
+    BaseMessageComponent baseMessageComponent = componentOptional.get();
+
+    if (baseMessageComponent instanceof Container) {
+        // Do something
+    }
+}
+```
+
+## Component list
+
+Here are all the components that can be used:
+
+- [Containers](/interactions/components/containers)
+- [Sections](/interactions/components/sections)
+- [Text Displays](/interactions/components/text-displays)
+- [Media Galleries](/interactions/components/media-galleries)
+- [Files](/interactions/components/files)
+- [Action Rows](/interactions/components/action-rows)
+- [Buttons](/interactions/components/buttons)
+- [Select Menus](/interactions/components/select-menus)
