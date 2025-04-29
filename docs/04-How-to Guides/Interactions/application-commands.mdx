@@ -6,7 +6,7 @@ slug: /interactions/application-commands
 ---
 
 :::note
-This page is a continuation of the [Interactions (Reference)](/interactions) which dives into *what* Interactions are.
+This page is a continuation of the [Interactions (Reference)](/Reference/Interactions) which dives into *what* Interactions are.
 :::
 
 :::note
@@ -225,7 +225,7 @@ Application commands follow a simple json structure defined by Discord, our gree
 ```
 
 :::tip
-`"type": 3` is the option type for `STRING`. See [Interactions (Reference) - Option Types](/interactions#option-types)
+`"type": 3` is the option type for `STRING`. See [Interactions (Reference) - Option Types](/Reference/Interactions#option-types)
 :::
 
 To read these files and run our code, we will be using the `GlobalCommandRegistrar` found in our
@@ -273,7 +273,7 @@ For message commands and user commands use `MessageInteractionEvent` and `UserIn
 ### Responding to Commands
 
 
-There are multiple ways of responding to a command, for a list of available methods see [this section](/interactions#method-summary). The simplest would be `reply()`:
+There are multiple ways of responding to a command, for a list of available methods see [this section](/Reference/Interactions#method-summary). The simplest would be `reply()`:
 
 ```java
 client.on(ChatInputInteractionEvent.class, event -> {
@@ -315,7 +315,7 @@ private static Mono<Message> methodThatTakesALongTime(ChatInputInteractionEvent 
 
 When using `reply`/`deferReply`/`createFollowup` everyone in the channel can see this, not just the user that issued the command.
 
-Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephmeral` means that only the user who issued the command will see the response.
+Since you may not always want that, Discord provides `ephemeral` versions of these response types. `ephemeral` means that only the user who issued the command will see the response.
 
 To respond ephemerally, we add an extra line:
 

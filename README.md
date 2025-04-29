@@ -1,6 +1,11 @@
-# Website
+# documentation 
+[![Discord](https://img.shields.io/discord/289587909051416579.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/d4j)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/5def01a0-d174-43c2-b6f1-9010dc6c2c8c/deploy-status)](https://app.netlify.com/sites/discord4j-docs/deploys)
 
-This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
+This is the repository for all the documentation for Discord4J. Content in this
+repository is published to [docs.discord4j.com](https://docs.discord4j.com).
+
+The website is built using [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
 
 ## Installation
 

@@ -1,0 +1,36 @@
+---
+id: sections
+title: Sections
+sidebar_label: Sections
+slug: /interactions/components/sections
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
+
+
+## Sections
+
+:::note
+This require the use of [Components V2](/interactions/components-v2).
+:::
+
+Section components allow you to define up to 3 text display components and add an accessory component (for now only thumbnails and buttons are supported) to the right side.
+
+```Java
+.withComponents(
+        Section.of(
+                Thumbnail.of(UnfurledMediaItem.of("https://discordapp.com/assets/f78426a064bc9dd24847519259bc42af.png")),
+                TextDisplay.of("One line of text"),
+                TextDisplay.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae mi ex. Sed a congue arcu. Donec tincidunt ipsum id imperdiet laoreet. Suspendisse malesuada pharetra porta. Sed iaculis sit amet ipsum a ullamcorper. Phasellus vel ornare orci. Etiam ac turpis ut lacus finibus semper non id elit. Morbi lectus lacus, pulvinar id quam vel, euismod cursus nibh. Sed in justo ac arcu eleifend efficitur. Phasellus eget quam nec ligula viverra venenatis. Integer sit amet mi lacinia, tempor urna a, facilisis dolor. Morbi eu pellentesque augue. Integer quam tortor, pulvinar ut consequat aliquam, tristique molestie nisl."),
+                TextDisplay.of("A third line of text")
+        )
+)
+```
+
+<ThemedImage
+    sources={{
+        light: useBaseUrl('/img/interactions/components-v2/section-light.png'),
+        dark: useBaseUrl('/img/interactions/components-v2/section-dark.png'),
+    }}
+/>
