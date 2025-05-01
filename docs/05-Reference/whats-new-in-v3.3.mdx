@@ -9,101 +9,11 @@ slug: /whats-new-in-v3-3
 
 After v3.3.0 releases, only bugfixes will be accepted in the 3.2.x branch.
 
-## Changes in discord-json
-### Class rename
-- `PositionModifyRequest`: This class has been split into two classes, `ChannelPositionModifyRequest` and `RolePositionModifyRequest`
+## Features
+// TODO: list all new features
 
-### Class hierarchy changed
-- `OnboardingData`: This interface now extends `BaseOnboardingData`. The `defaultChannelIds` and `enabled` methods were moved to the parent.
-- `OnboardingPromptData`: This interface now extends `BaseOnboardingPromptData`. The `type`, `title`, `singleSelect`, `required`, and `inOnboarding` methods were moved to the parent.
-- `OnboardingPromptOptionData`: This interface now extends `BaseOnboardingPromptOptionData`. The `channelsIds`, `rolesIds`, `title`, and `description` methods were moved to the parent.
+## API changes
+// TODO: list API changes
 
-### Deprecation
-- `ApplicationInfoData#summary`: This field is deprecated and will be removed in Discord API v11. This field always returns an empty string.
-- `ApplicationCommandData#dmPermission`: Use `ApplicationCommandData#contexts` instead
-
-### Field type change
-- `ResolvedChannelData`:
-- `name`: `String` -> `Possible<Optional<String>>`
-- `permissions`: `String` -> `Possible<Optional<String>>`
-
-- `OnboardingPromptOptionData`:
-- `emoji`: `EmojiData` -> `Possible<EmojiData>`
-
-- `ApplicationInfoData`:
-- `owner`: `UserData` -> `Possible<PartialUserData>`
-
-- `ApplicationTeamMemberData`:
-- `role`: `String` -> `Possible<String>`
-
-- `PositionModifyRequest` (now `ChannelPositionModifyRequest`):
-- `position`: `int` -> `Possible<Optional<Integer>>`
-
-## Changes in discord4j-core
-### Notable changes
-- Update gateway api version to 10
-- Calling any method that retrieves restricted data (message content, embeds, etc.) without enabling the `MESSAGE_CONTENT` will raise an `UnsupportedOperationException`
-- Created a new interface, `TopLevelGuildMessageWithThreadsChannel` that extends `TopLevelGuildMessageChannel`, used for `TextChannel` and `NewsChannel`. This interface represents text channels that can have threads (A `VoiceChannel` is also a `TopLevelGuildMessageChannel` but cannot have threads).
-- ReactionEmoji was removed in favor of a new structure to make it more consistent with the new discord features related to Emojis
-
-### Signature changes
-- `RestGuild#modifyChannelPositions` now takes a `List<ChannelPositionModifyRequest>` as parameter
-- `RestGuild#modifyRolePositions` now takes a `List<RolePositionModifyRequest>` as parameter
-- `GuildService#modifyGuildChannelPositions` now takes a `ChannelPositionModifyRequest[]` as parameter
-- `GuildService#modifyGuildRolePositions` now takes a `RolePositionModifyRequest[]` as parameter
-- `MessageCreateSpec#messageReference` now takes a `Possible<MessageReferenceData>` as parameter
-- `MessageCreateMono#withMessageReference` now takes a `Possible<MessageReferenceData>` as parameter
-
-- `ApplicationTeamMember#getRole` no longer returns `null` for the team owner, but `TeamMemberRole.ADMIN`
-- `ApplicationInfo#getOwnerId` now returns an `Optional<Snowflake>`
-- `RestGuild#modifyChannelPositions` now returns a `Flux<Void>`
-- `GuildService#modifyGuildChannelPositions` now returns a `Flux<Void>`
-- `MessageBulkDeleteEvent#getChannel` now returns a `Mono<MessageChannel>`
-- `VoiceState#getChannel` now returns a `Mono<AudioChannel>`
-- `ResolvedChannel#getName` now returns an `Optional<String>`
-- `ResolvedChannel#getEffectivePermissions` now returns an `Optional<PermissionSet>`
-
-- The `GuildEmoji` class now extends `CustomEmoji`
-- The `Category` class now extends `BaseTopLevelGuildChannel`
-- The `GuildMessageChannel` class now extends `GuildChannel, MessageChannel`
-- The `PrivateChannel` class now extends `BaseChannel` and implements `MessageChannel`
-- The `StoreChannel` class now extends `BaseTopLevelGuildChannel` and implements `CategorizableChannel`
-- The `NewsChannel` class now extends `BaseTopLevelGuildChannel` and implements `TopLevelGuildMessageWithThreadsChannel`
-- The `TextChannel` class now extends `BaseTopLevelGuildChannel` and implements `TopLevelGuildMessageWithThreadsChannel`
-- The `VoiceChannel` class now extends `BaseTopLevelGuildChannel` and implements `AudioChannel, TopLevelGuildMessageChannel`
-
-- The method `User#equals` is no longer final
-
-- Renamed method `Guild#getGuildEmojiById` to `getEmojiById`
-- Renamed `VoiceChannelJoinSpec` to `AudioChannelJoinSpec`
-- Renamed `VoiceChannelJoinMono` to `AudioChannelJoinMono`
-
-- Removed field `Routes#NITRO_STICKER_PACKS_GET` to `Routes#STICKER_PACK_GET`
-
-### Removed methods and classes
-- Removed method `AutoModRule#edit(String name, EventType eventType, boolean enabled)`
-- Removed method `ClientException#isRetryContextStatusCode`
-- Removed deprecated method `Message#suppressEmbeds`
-- Removed deprecated method `RestGuild#modifyOwnNickname`
-- Removed deprecated method `ChannelService#suppressEmbeds`
-- Removed `com.iwebpp.crypto` classes
-- Removed class `BaseCategorizableChannel`
-- Removed class `BaseGuildChannel`
-- Removed class `BaseGuildMessageChannel`
-- Removed class `BaseMessageChannel`
-- Removed class `BaseTopLevelGuildMessageChannel`
-- Removed class `ReactionEmoji` in favor of `Emoji`
-- Removed deprecated field `Routes#MESSAGE_SUPPRESS_EMBEDS`
-- Removed deprecated field `Routes#NICKNAME_MODIFY_OWN`
-
-### Deprecations
-- Deprecated method `IntegrationApplication#getSummary`
-- Deprecated method `Guild#getFeatures` (use `Guild#getGuildFeatures`)
-- Deprecated method `ApplicationInfo#isPublic` (use `ApplicationInfo#isBotPublic`)
-- Deprecated method `ApplicationInfo#requireCodeGrant` (use `ApplicationInfo#botRequiresCodeGrant`)
-- Deprecated method `ResolvedMember#getNicknameMention` (This type of ping has been deprecated in the Discord API)
-
-### Other changes
-- Using an `AutoModRuleEditMono` or `AutoModRuleEditSpec` no longer require all fields to be set
-- Remove Reactor dependency as it is unused in this repo, replaced `reactor.util.annotation.*` with `javax.annotation.*` from jsr305
-- Move classes in the encoding module to their own package (`discord4j.discordjson.encoding`) due to package name clashing with api module (issue when linking both modules in a project declaring a module-info.java)
+## Behavior changes
+// TODO: list behavior changes
