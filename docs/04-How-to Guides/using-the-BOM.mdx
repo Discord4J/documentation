@@ -73,7 +73,7 @@ You can also use SNAPSHOT and development builds from Jitpack with this BOM. You
 <repositories>
     <repository>
         <id>snapshots</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <url>https://central.sonatype.com/repository/maven-snapshots</url>
         <snapshots><enabled>true</enabled></snapshots>
     </repository>
     <repository>
@@ -88,7 +88,7 @@ You can also use SNAPSHOT and development builds from Jitpack with this BOM. You
 ```groovy
 repositories {
     // This repository is for SNAPSHOTs
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://central.sonatype.com/repository/maven-snapshots' }
     // This repository is for pulling dependencies from Jitpack
     maven { url 'https://jitpack.io' }
     // This repository is for releases
