@@ -62,25 +62,25 @@ dependencies {
 
 ### Field type change
 - `ResolvedChannelData`:
-- `name`: `String` -> `Possible<Optional<String>>`
-- `permissions`: `String` -> `Possible<Optional<String>>`
+    - `name`: `String` -> `Possible<Optional<String>>`
+    - `permissions`: `String` -> `Possible<Optional<String>>`
 
 - `OnboardingPromptOptionData`:
-- `emoji`: `EmojiData` -> `Possible<EmojiData>`
+    - `emoji`: `EmojiData` -> `Possible<EmojiData>`
 
 - `ApplicationInfoData`:
-- `owner`: `UserData` -> `Possible<PartialUserData>`
+    - `owner`: `UserData` -> `Possible<PartialUserData>`
 
 - `ApplicationTeamMemberData`:
-- `role`: `String` -> `Possible<String>`
+    - `role`: `String` -> `Possible<String>`
 
 - `PositionModifyRequest` (now `ChannelPositionModifyRequest`):
-- `position`: `int` -> `Possible<Optional<Integer>>`
+    - `position`: `int` -> `Possible<Optional<Integer>>`
 
 ## Changes in discord4j-core
 ### Notable changes
 - Update gateway api version to 10
-- Calling any method that retreives restricted data (message content, embeds, etc.) without enabling the `MESSAGE_CONTENT` will raise an `UnsupportedOperationException`
+- Calling any method that retrieves restricted data (message content, embeds, etc.) without enabling the `MESSAGE_CONTENT` will raise an `UnsupportedOperationException`
 - Created a new interface, `TopLevelGuildMessageWithThreadsChannel` that extends `TopLevelGuildMessageChannel`, used for `TextChannel` and `NewsChannel`. This interface represents text channels that can have threads (A `VoiceChannel` is also a `TopLevelGuildMessageChannel` but cannot have threads).
 
 ### Signature changes
