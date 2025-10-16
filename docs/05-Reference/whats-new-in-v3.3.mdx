@@ -83,7 +83,7 @@ We now support more news channel types like:
 - Deprecated method `ResolvedMember#getNicknameMention` (This type of ping has been deprecated in the Discord API)
 
 ### Other changes
-- Using an `AutoModRuleEditMono` or `AutoModRuleEditSpec` no longer require all fields to be set
+- Using an `AutoModRuleEditMono` or `AutoModRuleEditSpec` no longer requires all fields to be set
 - Remove Reactor dependency as it is unused in this repo, replaced `reactor.util.annotation.*` with `javax.annotation.*` from jsr305
 - Move classes in the encoding module to their own package (`discord4j.discordjson.encoding`) due to package name clashing with api module (issue when linking both modules in a project declaring a module-info.java)
 
