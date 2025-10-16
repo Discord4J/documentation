@@ -79,7 +79,7 @@ dependencies {
 
 ## Changes in discord4j-core
 ### Notable changes
-- Update gateway api version to 10
+- Update gateway API version to 10
 - Calling any method that retrieves restricted data (message content, embeds, etc.) without enabling the `MESSAGE_CONTENT` will raise an `UnsupportedOperationException`
 - Created a new interface, `TopLevelGuildMessageWithThreadsChannel` that extends `TopLevelGuildMessageChannel`, used for `TextChannel` and `NewsChannel`. This interface represents text channels that can have threads (A `VoiceChannel` is also a `TopLevelGuildMessageChannel` but cannot have threads).
 
