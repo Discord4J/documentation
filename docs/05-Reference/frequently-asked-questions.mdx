@@ -59,14 +59,14 @@ This can be achieved through Maven or Gradle
 
 #### Maven
 
-Use [maven-shade-plugin](https://rmannibucau.metawerx.net/post/mavens-shade-plugin-source-relocation).
+Use [maven-shade-plugin](https://maven.apache.org/plugins/maven-shade-plugin/examples/class-relocation.html).
 
 ```xml
 <!-- pom.xml -->
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-shade-plugin</artifactId>
-  <version>3.3.1</version>
+  <version>3.6.1</version>
   <executions>
     <execution>
       <phase>package</phase>
