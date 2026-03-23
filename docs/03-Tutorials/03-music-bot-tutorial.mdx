@@ -6,7 +6,11 @@ slug: /music-bot-tutorial
 ---
 
 :::note
-This tutorial is not yet migrated to Diataxis framework and might be out of date as it was updated for Discord4J v3.1.x.
+You can refer to a demo of a Discord BOT for music in [Discord4J music-player-demo](https://github.com/Discord4J/music-player-demo) repository.
+:::
+
+:::note
+This tutorial is not yet migrated to Diataxis framework and might be out of date as it was updated for Discord4J v3.3.x.
 
 Feel free to suggest changes to it in our [Discord Server](https://discord.gg/d4j) or through a [GitHub issue](https://github.com/Discord4J/Discord4J/issues/new/choose) if you encounter issues while following it.
 :::
@@ -33,7 +37,7 @@ It is expected to complete this tutorial in under 15 minutes.
 - You should already have your bot created and its token ready for use. If you do not, go to this [link](https://discord.com/developers/applications/), create an application, obtain the bot token, and the Client ID.
 - JDK 8 or above should already be downloaded and/or installed on your system.
 - This tutorial assumes you are familiar with Java 8 or above concepts with a special emphasis in lambdas. If you are unfamiliar with lambdas, please visit our [Lambda Tutorial](/lambda-tutorial).
-- This tutorial uses [IntelliJ](https://www.jetbrains.com/idea/) to set up the programming environment and it is assumed to already be installed on your system. Eclipse, Netbeans, and other IDEs have similar, but slightly different, setup processes. Please consult the documentation for your specific IDE as it is necessary.
+- This tutorial uses [IntelliJ IDEA](https://www.jetbrains.com/idea/) to set up the programming environment and it is assumed to already be installed on your system. Eclipse, Netbeans, and other IDEs have similar, but slightly different, setup processes. Please consult the documentation for your specific IDE as it is necessary.
 
 ### Setting Up IntelliJ
 
@@ -89,7 +93,7 @@ IntelliJ will automatically open the _pom.xml_ after it has created the project.
 
 Important: Version numbers shown in these images might be outdated. While following this tutorial, prefer using the latest version in the 3.1.x line:
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
+[![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.3.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
 
 <img src="/img/music_bot/ij_maven_versionnum.png" />
 
@@ -97,7 +101,7 @@ Important: Version numbers shown in these images might be outdated. While follow
 
 #### Step 7
 
-Under **External Libraries** on the navigation pane, `discord4j-core` should be present. This means Discord4J has been properly imported, and we are ready to utilize it in our project!
+Under **External Libraries** on the navigation pane, `discord4j-core` should be present. This means Discord4J has been properly imported, and we are ready to use it in our project!
 <img src="/img/music_bot/ij_maven_external_libraries.png" />
 
 ---
@@ -140,20 +144,7 @@ Choose a class name. It will contain our main method and as a personal preferenc
 
 Create a main method and add the code below. Assume `args` refers to the String array that is standard on all main methods, i.e., `String[] args`.
 
-###### Using Discord4J v3.0.x
-
-```java
-final DiscordClient client = new DiscordClientBuilder(args[0]).build();
-client.login().block();
-```
-
-What is happening here? Well in order to make our bot appear online it has to _login_. The ability to _login_ is only applicable to an instance of `DiscordClient` and the only way to obtain a `DiscordClient` instance is to build it using `DiscordClientBuilder`. We first build `DiscordClientBuilder` using `args[0]` which will take the first argument of our program which we will use to pass our bot token. Since we are not interested in any other options from `DiscordClientBuilder` we can just simply build a `DiscordClient` by calling `build`.
-
-Once we have our `DiscordClient` instance we now call `login`. However, `login` returns a type called a `Mono`, which is an _asynchronous_ and _lazy_ data type. It doesn't _do_ anything until we _request_ it to do so and the ability to _request_ an action can be accomplished in numerous ways. For now, we will call `block` which essentially means "request this action and wait (*block*ing the current thread) for it to finish".
-
-**v3.0 behavior:** `login` will not "finish" until the bot is completely disconnected, i.e., calling `logout` at some point in the future.
-
-###### Using Discord4J v3.1.x and above
+###### Using Discord4J v3.2.x and above
 
 ```java
 final GatewayDiscordClient client = DiscordClientBuilder.create(args[0]).build()
@@ -161,8 +152,6 @@ final GatewayDiscordClient client = DiscordClientBuilder.create(args[0]).build()
     .block();
 client.onDisconnect().block();
 ```
-
-**v3.1 behavior:** `login` will not "finish" until the bot has **connected to the Gateway** and will return a `GatewayDiscordClient` object that can be used to operate on the Discord real-time websocket for bots.
 
 ---
 
@@ -199,7 +188,7 @@ After IntelliJ compiles your program and starts, you'll immediately encounter an
 
 ### Adding Commands
 
-Once the bot appears online we should allow it to respond to certain input from users. This section will cover one of the many ways to implement commands, or specifically structured user input, to allow responses from our bot.
+Once the bot appears online, we should allow it to respond to certain input from users. This section will cover one of the many ways to implement commands, or specifically structured user input, to allow responses from our bot.
 
 #### Code Notice
 
@@ -281,42 +270,9 @@ Finally, we need a way to hook up our command system to Discord4J's event system
 
 After having an event, we need to do some basic filtering to make sure we are executing the right commands for the right messages. To do this, we will simply iterate through all our commands, check if the contents of the message starts with a prefix plus the command we are checking against and, if it does, execute the command.
 
-**Discord4J v3.0.x**: **Add** the following code **after** building the `DiscordClient`, but **before** `login`:
-**Discord4J v3.1.x**: **Add** the following code **after** building the `GatewayDiscordClient`, but **before** `onDisconnect`:
+**Discord4J v3.2.x or above**: **Add** the following code **after** building the `GatewayDiscordClient`, but **before** `onDisconnect`:
 
-###### Discord4J 3.0.x - Imperative Approach
-
-```java
-client.getEventDispatcher().on(MessageCreateEvent.class)
-    // subscribe is like block, in that it will *request* for action
-    // to be done, but instead of blocking the thread, waiting for it
-    // to finish, it will just execute the results asynchronously.
-    .subscribe(event -> {
-        final String content = event.getMessage().getContent().orElse("");
-        for (final Map.Entry<String, Command> entry : commands.entrySet()) {
-            // We will be using ! as our "prefix" to any command in the system.
-            if (content.startsWith('!' + entry.getKey())) {
-                entry.getValue().execute(event);
-                break;
-            }
-        }
-    });
-```
-
-###### Discord4J 3.0.x - Reactive Approach
-
-```java
-client.getEventDispatcher().on(MessageCreateEvent.class)
-    .flatMap(event -> Mono.justOrEmpty(event.getMessage().getContent())
-        .flatMap(content -> Flux.fromIterable(commands.entrySet())
-            // We will be using ! as our "prefix" to any command in the system.
-            .filter(entry -> content.startsWith('!' + entry.getKey()))
-            .flatMap(entry -> entry.getValue().execute(event))
-            .next()))
-    .subscribe();
-```
-
-###### Discord4J 3.1.x - Imperative Approach
+###### Discord4J 3.2.x - Imperative Approach
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
@@ -337,7 +293,7 @@ client.getEventDispatcher().on(MessageCreateEvent.class)
     });
 ```
 
-###### Discord4J 3.1.x - Reactive Approach
+###### Discord4J 3.2.x - Reactive Approach
 
 ```java
 client.getEventDispatcher().on(MessageCreateEvent.class)
@@ -371,9 +327,9 @@ In order to playback audio from a YouTube link we need to be able to extract aud
 
 Important: Version numbers shown in these images might be outdated. While following this tutorial, prefer using the latest version in the 3.1.x line:
 
-For `discord4j-core`: [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.1.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
+For `discord4j-core`: [![Maven Central](https://img.shields.io/maven-central/v/com.discord4j/discord4j-core/3.3.svg?style=flat-square)](https://search.maven.org/artifact/com.discord4j/discord4j-core)
 
-For `lavaplayer`: [![Bintray](https://api.bintray.com/packages/sedmelluq/com.sedmelluq/lavaplayer/images/download.svg)](https://bintray.com/sedmelluq/com.sedmelluq/lavaplayer)
+For `lavaplayer`: [![dv8tion](https://img.shields.io/badge/dv8tion-8A2BE2)](https://github.com/sedmelluq/lavaplayer)
 
 <img src="/img/music_bot/ij_maven_lavaplayer.png" />
 
